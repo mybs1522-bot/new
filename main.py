@@ -453,6 +453,21 @@ async def serve_admin_page():
         )
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
+@app.get("/learn")
+async def serve_learn_page():
+    """Serves the Crochet Video Masterclass learning portal."""
+    learn_html = os.path.join(STATIC_DIR, "learn.html")
+    if os.path.exists(learn_html):
+        return FileResponse(
+            learn_html,
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
+        )
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
 @app.post("/api/catalog/scan")
 async def rescan_folder(req: ScanFolderRequest):
     """Rescans a directory on disk."""
