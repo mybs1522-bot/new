@@ -17,6 +17,10 @@ let searchTimeout = null;
 // Customer Authentication State
 let customerToken = localStorage.getItem('customer_token') || '';
 let currentUser = null;
+try {
+  const cachedUser = localStorage.getItem('customer_user');
+  if (cachedUser) currentUser = JSON.parse(cachedUser);
+} catch (e) {}
 let authMode = 'login'; // 'login' or 'signup'
 
 function getAuthHeaders() {
@@ -159,11 +163,34 @@ async function checkAuthStatus() {
     }
     return;
   }
+
+  // Render cached profile immediately so UI never flashes logged out
+  if (currentUser) {
+    if (openAuthModalBtn) openAuthModalBtn.classList.add('hidden');
+    if (userProfilePill) {
+      userProfilePill.classList.remove('hidden');
+      userProfilePill.classList.add('flex');
+    }
+    if (userEmailLabel) userEmailLabel.textContent = currentUser.email;
+    if (userAccessBadge) {
+      if (currentUser.has_unlocked_all) {
+        userAccessBadge.textContent = 'Unlocked ✓';
+        userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 font-semibold';
+        catalogData.global_unlocked = true;
+        updateGlobalLockBadge();
+      } else {
+        userAccessBadge.textContent = 'Free';
+        userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
+      }
+    }
+  }
+
   try {
     const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
     if (res.ok) {
       const data = await res.json();
       currentUser = data.user;
+      localStorage.setItem('customer_user', JSON.stringify(currentUser));
       if (openAuthModalBtn) openAuthModalBtn.classList.add('hidden');
       if (userProfilePill) {
         userProfilePill.classList.remove('hidden');
@@ -181,8 +208,10 @@ async function checkAuthStatus() {
           userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
         }
       }
-    } else {
+    } else if (res.status === 401) {
+      // Only clear credentials if server explicitly rejects token
       localStorage.removeItem('customer_token');
+      localStorage.removeItem('customer_user');
       customerToken = '';
       currentUser = null;
       if (openAuthModalBtn) openAuthModalBtn.classList.remove('hidden');
@@ -192,7 +221,7 @@ async function checkAuthStatus() {
       }
     }
   } catch (err) {
-    console.error('Auth check error:', err);
+    console.error('Auth check error (preserving session):', err);
   }
 }
 
@@ -389,12 +418,19 @@ function renderThumbnails() {
     imgWrapper.className = 'relative w-full aspect-[1/1.4] rounded-lg overflow-hidden bg-slate-800 flex items-center justify-center';
 
     const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.decoding = 'async';
     const thumbUrl = new URL(page.image_url, window.location.origin);
     thumbUrl.searchParams.set('dpi', '36');
     if (customerToken) thumbUrl.searchParams.set('token', customerToken);
     img.src = thumbUrl.toString();
     img.alt = `Page ${page.page_num}`;
-    img.className = 'w-full h-full object-cover';
+    img.className = 'w-full h-full object-cover transition-opacity duration-300';
+    img.onerror = () => {
+      setTimeout(() => {
+        if (img) img.src = thumbUrl.toString() + '&_r=' + Date.now();
+      }, 1500);
+    };
     imgWrapper.appendChild(img);
 
     if (page.is_blurred) {
@@ -466,12 +502,19 @@ function renderPages() {
     imgContainer.className = 'relative w-full aspect-[1/1.414] bg-slate-900 flex items-center justify-center';
 
     const pageImg = document.createElement('img');
+    pageImg.loading = 'lazy';
+    pageImg.decoding = 'async';
     const pUrl = new URL(page.image_url, window.location.origin);
     pUrl.searchParams.set('dpi', '144');
     if (customerToken) pUrl.searchParams.set('token', customerToken);
     pageImg.src = pUrl.toString();
     pageImg.alt = `Page ${page.page_num}`;
-    pageImg.className = 'w-full h-full object-contain';
+    pageImg.className = 'w-full h-full object-contain transition-opacity duration-300';
+    pageImg.onerror = () => {
+      setTimeout(() => {
+        if (pageImg) pageImg.src = pUrl.toString() + '&_r=' + Date.now();
+      }, 1500);
+    };
     imgContainer.appendChild(pageImg);
 
     // If blurred, overlay the Paywall Card
@@ -1018,8 +1061,9 @@ if (authForm) {
       }
 
       customerToken = data.token;
-      localStorage.setItem('customer_token', customerToken);
       currentUser = data.user;
+      localStorage.setItem('customer_token', customerToken);
+      localStorage.setItem('customer_user', JSON.stringify(currentUser));
       authModal.classList.add('hidden');
 
       showToast(authMode === 'signup' ? '🎉 Welcome! Your account is now active.' : `Welcome back, ${currentUser.email}!`, 'success');
@@ -1046,6 +1090,7 @@ if (userLogoutBtn) {
       await fetch('/api/auth/logout', { method: 'POST', headers: getAuthHeaders() });
     } catch (e) {}
     localStorage.removeItem('customer_token');
+    localStorage.removeItem('customer_user');
     customerToken = '';
     currentUser = null;
     showToast('Signed out successfully.', 'info');

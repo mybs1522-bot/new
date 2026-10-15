@@ -111,6 +111,36 @@ def scan_directory(folder_path: str = DEFAULT_FOLDER):
     """Scans the local folder or falls back to Cloudflare R2 bucket for cloud deployments."""
     global CATALOG, CURRENT_FOLDER
     
+    # 0. Load instantly from pre-computed manifest with exact page counts for all 948 books
+    manifest_path = os.path.join(BASE_DIR, "catalog_manifest.json")
+    if not os.path.exists(manifest_path):
+        manifest_path = os.path.join(BASE_DIR, "cache", "catalog_manifest.json")
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                manifest_data = json.load(f)
+                CATALOG.clear()
+                for b_id, item in manifest_data.items():
+                    fname = item["filename"]
+                    fpath = os.path.join(folder_path, fname) if (folder_path and os.path.exists(folder_path)) else None
+                    if fpath and not os.path.exists(fpath):
+                        fpath = None
+                    CATALOG[b_id] = {
+                        "id": item["id"],
+                        "filename": fname,
+                        "title": item["title"],
+                        "filepath": fpath,
+                        "file_size": item.get("file_size", 0),
+                        "page_count": item.get("page_count", 2),
+                        "unlocked": False,
+                        "is_uploaded": False
+                    }
+                CURRENT_FOLDER = folder_path if (folder_path and os.path.exists(folder_path)) else "Cloudflare R2 Bucket (crochet)"
+                print(f"Catalog loaded instantly from manifest: {len(CATALOG)} books with pre-computed page counts.")
+                return len(CATALOG)
+        except Exception as e:
+            print("Notice: Error loading catalog manifest:", e)
+
     # 1. If local folder exists on disk, scan local PDFs
     if folder_path and os.path.exists(folder_path):
         CURRENT_FOLDER = folder_path
@@ -524,8 +554,22 @@ async def get_book_page(
 
     user_unlocked = GLOBAL_UNLOCKED or (user is not None and user.get("has_unlocked_all", False))
     is_unlocked = user_unlocked or book["unlocked"]
+    should_blur = (page_num > 2) and (not is_unlocked)
 
+    # 1. Multi-tier Disk Cache Check
+    pages_dir = os.path.join(CACHE_DIR, "pages")
+    os.makedirs(pages_dir, exist_ok=True)
+    blur_tag = "blurred" if should_blur else "clear"
+    page_cache_path = os.path.join(pages_dir, f"{book_id}_p{page_num}_{dpi}_{blur_tag}.jpg")
 
+    if os.path.exists(page_cache_path) and os.path.getsize(page_cache_path) > 0:
+        return FileResponse(
+            page_cache_path,
+            media_type="image/jpeg",
+            headers={"Cache-Control": "public, max-age=86400, stale-while-revalidate=604800"}
+        )
+
+    # 2. Render page from PDF
     try:
         doc = get_pdf_document(book)
         total_pages = len(doc)
@@ -542,16 +586,31 @@ async def get_book_page(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Page rendering error: {str(e)}")
 
-    # Check paywall condition
-    should_blur = (page_num > 2) and (not is_unlocked)
     if should_blur:
         # Genuine server-side irreversible Gaussian Blur (radius 18)
         img = img.filter(ImageFilter.GaussianBlur(radius=18))
 
+    # Save to disk cache atomically
+    tmp_page_cache = page_cache_path + f".tmp.{uuid.uuid4().hex[:6]}"
+    try:
+        img.save(tmp_page_cache, format="JPEG", quality=82, optimize=True)
+        if os.path.exists(tmp_page_cache):
+            os.replace(tmp_page_cache, page_cache_path)
+    except Exception:
+        pass
+
+    target_file = page_cache_path if os.path.exists(page_cache_path) else tmp_page_cache
+    if os.path.exists(target_file):
+        return FileResponse(
+            target_file,
+            media_type="image/jpeg",
+            headers={"Cache-Control": "public, max-age=86400, stale-while-revalidate=604800"}
+        )
+
     buf = io.BytesIO()
-    img.save(buf, format="JPEG", quality=85, optimize=True)
+    img.save(buf, format="JPEG", quality=82, optimize=True)
     buf.seek(0)
-    return Response(content=buf.getvalue(), media_type="image/jpeg")
+    return Response(content=buf.getvalue(), media_type="image/jpeg", headers={"Cache-Control": "public, max-age=86400"})
 
 @app.post("/api/catalog/unlock-all")
 async def unlock_all_books(

@@ -11,6 +11,8 @@ This module provides:
 
 import os
 import sys
+import threading
+import uuid
 from typing import Optional, Dict, Any
 import boto3
 from botocore.config import Config
@@ -156,18 +158,47 @@ def sync_local_folder_to_r2(folder_path: str, progress_callback=None) -> Dict[st
         "bucket": R2_BUCKET_NAME
     }
 
+_download_locks: Dict[str, threading.Lock] = {}
+_locks_mutex = threading.Lock()
+
+def _get_lock_for_key(key: str) -> threading.Lock:
+    with _locks_mutex:
+        if key not in _download_locks:
+            _download_locks[key] = threading.Lock()
+        return _download_locks[key]
+
 def download_file_from_r2(r2_key: str, dest_path: str) -> bool:
-    """Downloads a file from Cloudflare R2 to local destination path."""
-    client = get_r2_client()
-    if not client:
-        return False
-    try:
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        client.download_file(R2_BUCKET_NAME, r2_key, dest_path)
+    """Downloads a file from Cloudflare R2 to local destination path atomically with lock."""
+    # Fast path: file already exists and is non-empty
+    if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0:
         return True
-    except Exception as e:
-        print(f"Error downloading {r2_key} from R2: {e}")
-        return False
+
+    lock = _get_lock_for_key(r2_key)
+    with lock:
+        # Check again inside lock
+        if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0:
+            return True
+
+        client = get_r2_client()
+        if not client:
+            return False
+
+        tmp_dest = dest_path + f".tmp.{uuid.uuid4().hex[:8]}"
+        try:
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            client.download_file(R2_BUCKET_NAME, r2_key, tmp_dest)
+            if os.path.exists(tmp_dest) and os.path.getsize(tmp_dest) > 0:
+                os.replace(tmp_dest, dest_path)
+                return True
+            return False
+        except Exception as e:
+            print(f"Error downloading {r2_key} from R2: {e}")
+            if os.path.exists(tmp_dest):
+                try:
+                    os.remove(tmp_dest)
+                except Exception:
+                    pass
+            return False
 
 def list_patterns_from_r2() -> list:
     """Lists all patterns stored in the Cloudflare R2 bucket."""

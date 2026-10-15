@@ -12,6 +12,10 @@ import hashlib
 import secrets
 from datetime import datetime
 from typing import Optional, List, Set, Dict, Any
+import hmac
+import base64
+
+SESSION_SECRET = os.getenv("SESSION_SECRET", "crochet-master-library-secret-salt-2026")
 
 IS_SERVERLESS = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
 if IS_SERVERLESS:
@@ -425,23 +429,36 @@ def toggle_starred_book(book_id: str) -> bool:
 # ----------------- Session Management -----------------
 
 def create_session(user_id: int) -> str:
-    """Generates a secure session token and saves to SQLite."""
-    token = secrets.token_urlsafe(32)
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-    INSERT INTO sessions (token, user_id, created_at)
-    VALUES (?, ?, ?)
-    """, (token, user_id, datetime.utcnow().isoformat()))
-    conn.commit()
-    conn.close()
-    sync_db_to_r2()
+    """Generates a tamper-proof cryptographic signed session token that works across all instances and reloads."""
+    now = int(time.time())
+    payload = f"{user_id}:{now}"
+    sig = hmac.new(SESSION_SECRET.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()
+    # Format: base64(user_id:timestamp:sig)
+    token = base64.urlsafe_b64encode(f"{payload}:{sig}".encode('utf-8')).decode('utf-8')
     return token
 
 def get_user_by_session(token: str) -> Optional[Dict[str, Any]]:
-    """Fetches user matching the session token."""
+    """Fetches user matching the session token. Validates HMAC signature with zero network dependency."""
     if not token:
         return None
+    token = token.strip()
+
+    # 1. First, validate signed token format
+    try:
+        raw = base64.urlsafe_b64decode(token.encode('utf-8')).decode('utf-8')
+        parts = raw.split(":")
+        if len(parts) == 3:
+            user_id_str, ts_str, sig = parts
+            payload = f"{user_id_str}:{ts_str}"
+            expected_sig = hmac.new(SESSION_SECRET.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()
+            if secrets.compare_digest(sig, expected_sig):
+                user = get_user_by_id(int(user_id_str))
+                if user:
+                    return user
+    except Exception:
+        pass
+
+    # 2. Backward compatibility: check legacy SQLite sessions table
     sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
@@ -479,12 +496,15 @@ def delete_session(token: str):
     """Deletes a session token on logout."""
     if not token:
         return
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM sessions WHERE token = ?", (token,))
-    conn.commit()
-    conn.close()
-    sync_db_to_r2()
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        conn.commit()
+        conn.close()
+        sync_db_to_r2()
+    except Exception:
+        pass
 
 def record_order(user_id: int, order_ref: str, amount: float = 39.00) -> bool:
     """Records order and unlocks catalog for user."""
