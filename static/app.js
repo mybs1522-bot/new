@@ -38,8 +38,6 @@ const readerToolbar = document.getElementById('readerToolbar');
 const backToLibraryBtn = document.getElementById('backToLibraryBtn');
 const globalStatusBadge = document.getElementById('globalStatusBadge');
 const topSubheader = document.getElementById('topSubheader');
-const toggleLockDemoBtn = document.getElementById('toggleLockDemoBtn');
-const toggleLockBtnLabel = document.getElementById('toggleLockBtnLabel');
 const topUnlockAllBtn = document.getElementById('topUnlockAllBtn');
 const bannerUnlockBtn = document.getElementById('bannerUnlockBtn');
 
@@ -231,7 +229,6 @@ function updateGlobalLockBadge() {
       globalStatusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25';
       globalStatusBadge.innerHTML = '✓ All Patterns Unlocked';
     }
-    if (toggleLockBtnLabel) toggleLockBtnLabel.textContent = 'Lock Library';
     if (topUnlockAllBtn) topUnlockAllBtn.classList.add('hidden');
     if (bannerUnlockBtn) bannerUnlockBtn.classList.add('hidden');
   } else {
@@ -239,7 +236,6 @@ function updateGlobalLockBadge() {
       globalStatusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25';
       globalStatusBadge.innerHTML = 'Preview Mode';
     }
-    if (toggleLockBtnLabel) toggleLockBtnLabel.textContent = 'Demo Unlock';
     if (topUnlockAllBtn) topUnlockAllBtn.classList.remove('hidden');
     if (bannerUnlockBtn) bannerUnlockBtn.classList.remove('hidden');
   }
@@ -570,18 +566,14 @@ function createPaywallOverlay(pageNum) {
         </div>
         <div class="flex items-center gap-2">
           <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-400"></i>
-          <span>Cancel anytime</span>
+          <span>One-time payment, lifetime updates</span>
         </div>
       </div>
 
-      <div class="space-y-2 pt-1">
+      <div class="pt-1">
         <button class="paywall-cta-trigger w-full py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm text-zinc-950 bg-white hover:bg-zinc-200 shadow-sm transition flex items-center justify-center gap-2">
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-zinc-700"></i>
-          <span>Unlock All Patterns — $9.99/mo</span>
-        </button>
-
-        <button class="demo-quick-unlock text-xs text-zinc-400 hover:text-zinc-200 font-medium underline underline-offset-4 transition">
-          Or 1-Click Demo Unlock
+          <span>Unlock Lifetime All-Access ($39)</span>
         </button>
       </div>
 
@@ -589,9 +581,6 @@ function createPaywallOverlay(pageNum) {
   `;
 
   overlay.querySelector('.paywall-cta-trigger').addEventListener('click', openPaywallModal);
-  overlay.querySelector('.demo-quick-unlock').addEventListener('click', () => {
-    executeUnlock('DEMO');
-  });
 
   return overlay;
 }
@@ -756,37 +745,6 @@ applyPromoBtn.addEventListener('click', () => {
   executeUnlock(code);
 });
 
-
-// Toggle Lock State
-if (toggleLockDemoBtn) {
-  toggleLockDemoBtn.addEventListener('click', async () => {
-    try {
-      if (catalogData.global_unlocked) {
-        await fetch('/api/catalog/lock-all', { method: 'POST', headers: getAuthHeaders() });
-        showToast('Library access re-locked.', 'info');
-        catalogData.global_unlocked = false;
-      } else {
-        await fetch('/api/catalog/unlock-all', {
-          method: 'POST',
-          headers: getAuthHeaders(),
-          body: JSON.stringify({ code: 'DEMO' })
-        });
-        showToast('All 948+ patterns unlocked!', 'success');
-        catalogData.global_unlocked = true;
-      }
-
-      updateGlobalLockBadge();
-      await checkAuthStatus();
-      if (currentBook) {
-        await openBookReader(currentBook.id);
-      } else {
-        await fetchCatalog(catalogData.page);
-      }
-    } catch (err) {
-      showToast(err.message, 'error');
-    }
-  });
-}
 
 // Download menu
 downloadDropdownBtn.addEventListener('click', (e) => {
