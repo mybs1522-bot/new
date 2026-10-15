@@ -14,13 +14,70 @@ let currentZoom = 1.0;
 let activePageIndex = 0;
 let searchTimeout = null;
 
-// Customer Authentication State
-let customerToken = localStorage.getItem('customer_token') || '';
+// Customer Authentication State & Multi-Tier Persistence (localStorage + 10-year Cookie)
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+  }
+  return '';
+}
+
+function setCookie(name, value, days = 3650) {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  const expires = "; expires=" + date.toUTCString();
+  document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+}
+
+function deleteCookie(name) {
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax";
+}
+
+function saveCustomerSession(token, user) {
+  if (!token) return;
+  customerToken = token;
+  if (user) {
+    currentUser = typeof user === 'string' ? JSON.parse(user) : user;
+  }
+  try {
+    localStorage.setItem('customer_token', token);
+    if (currentUser) localStorage.setItem('customer_user', JSON.stringify(currentUser));
+  } catch (e) {}
+  setCookie('customer_token', token, 3650);
+  if (currentUser) setCookie('customer_user', JSON.stringify(currentUser), 3650);
+}
+
+function clearCustomerSession() {
+  customerToken = '';
+  currentUser = null;
+  try {
+    localStorage.removeItem('customer_token');
+    localStorage.removeItem('customer_user');
+  } catch (e) {}
+  deleteCookie('customer_token');
+  deleteCookie('customer_user');
+}
+
+let customerToken = '';
+try {
+  customerToken = localStorage.getItem('customer_token') || getCookie('customer_token') || '';
+} catch (e) {}
+
 let currentUser = null;
 try {
-  const cachedUser = localStorage.getItem('customer_user');
+  const cachedUser = localStorage.getItem('customer_user') || getCookie('customer_user');
   if (cachedUser) currentUser = JSON.parse(cachedUser);
 } catch (e) {}
+
+// If token exists, ensure currentUser exists so customer is never kicked out
+if (customerToken && !currentUser) {
+  currentUser = { email: 'Customer', has_unlocked_all: false };
+}
+
 let authMode = 'login'; // 'login' or 'signup'
 
 function getAuthHeaders() {
@@ -188,44 +245,33 @@ async function checkAuthStatus() {
     }
   }
 
-  try {
-    const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
-    if (res.ok) {
-      const data = await res.json();
-      currentUser = data.user;
-      localStorage.setItem('customer_user', JSON.stringify(currentUser));
-      if (openAuthModalBtn) openAuthModalBtn.classList.add('hidden');
-      if (userProfilePill) {
-        userProfilePill.classList.remove('hidden');
-        userProfilePill.classList.add('flex');
-      }
-      if (userEmailLabel) userEmailLabel.textContent = currentUser.email;
-      if (userAccessBadge) {
-        if (currentUser.has_unlocked_all) {
-          userAccessBadge.textContent = 'Unlocked ✓';
-          userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 font-semibold';
-          catalogData.global_unlocked = true;
-          updateGlobalLockBadge();
-        } else {
-          userAccessBadge.textContent = 'Free';
-          userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
+    try {
+      const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        saveCustomerSession(customerToken, data.user);
+        if (openAuthModalBtn) openAuthModalBtn.classList.add('hidden');
+        if (userProfilePill) {
+          userProfilePill.classList.remove('hidden');
+          userProfilePill.classList.add('flex');
+        }
+        if (userEmailLabel) userEmailLabel.textContent = currentUser.email;
+        if (userAccessBadge) {
+          if (currentUser.has_unlocked_all) {
+            userAccessBadge.textContent = 'Unlocked ✓';
+            userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 font-semibold';
+            catalogData.global_unlocked = true;
+            updateGlobalLockBadge();
+          } else {
+            userAccessBadge.textContent = 'Free';
+            userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
+          }
         }
       }
-    } else if (res.status === 401) {
-      // Only clear credentials if server explicitly rejects token
-      localStorage.removeItem('customer_token');
-      localStorage.removeItem('customer_user');
-      customerToken = '';
-      currentUser = null;
-      if (openAuthModalBtn) openAuthModalBtn.classList.remove('hidden');
-      if (userProfilePill) {
-        userProfilePill.classList.add('hidden');
-        userProfilePill.classList.remove('flex');
-      }
+      // Never log out customer automatically! Session persists until customer clicks Logout.
+    } catch (err) {
+      console.warn('Auth check network warning (preserving customer session):', err);
     }
-  } catch (err) {
-    console.error('Auth check error (preserving session):', err);
-  }
 }
 
 function updateGlobalLockBadge() {
@@ -891,12 +937,7 @@ async function handleOnPageCardPayment() {
       }
 
       if (verifyData.token) {
-        customerToken = verifyData.token;
-        localStorage.setItem('customer_token', customerToken);
-      }
-      if (verifyData.user) {
-        currentUser = verifyData.user;
-        localStorage.setItem('customer_user', JSON.stringify(currentUser));
+        saveCustomerSession(verifyData.token, verifyData.user);
       }
 
       catalogData.global_unlocked = true;
@@ -961,12 +1002,7 @@ async function handlePayPalCheckout() {
     if (!res.ok) throw new Error(data.detail || 'PayPal checkout failed');
 
     if (data.token) {
-      customerToken = data.token;
-      localStorage.setItem('customer_token', customerToken);
-    }
-    if (data.user) {
-      currentUser = data.user;
-      localStorage.setItem('customer_user', JSON.stringify(currentUser));
+      saveCustomerSession(data.token, data.user);
     }
 
     catalogData.global_unlocked = true;
@@ -1277,10 +1313,7 @@ if (authForm) {
         throw new Error(data.detail || 'Authentication failed');
       }
 
-      customerToken = data.token;
-      currentUser = data.user;
-      localStorage.setItem('customer_token', customerToken);
-      localStorage.setItem('customer_user', JSON.stringify(currentUser));
+      saveCustomerSession(data.token, data.user);
       authModal.classList.add('hidden');
 
       showToast(authMode === 'signup' ? '🎉 Welcome! Your account is now active.' : `Welcome back, ${currentUser.email}!`, 'success');
@@ -1306,10 +1339,7 @@ if (userLogoutBtn) {
     try {
       await fetch('/api/auth/logout', { method: 'POST', headers: getAuthHeaders() });
     } catch (e) {}
-    localStorage.removeItem('customer_token');
-    localStorage.removeItem('customer_user');
-    customerToken = '';
-    currentUser = null;
+    clearCustomerSession();
     showToast('Signed out successfully.', 'info');
     checkAuthStatus();
     fetchCatalog(catalogData.page);
@@ -1329,8 +1359,7 @@ async function handlePaymentReturn() {
       const data = await res.json();
       if (data.paid) {
         if (data.token) {
-          customerToken = data.token;
-          localStorage.setItem('customer_token', data.token);
+          saveCustomerSession(data.token, data.user);
         }
         catalogData.global_unlocked = true;
         updateGlobalLockBadge();

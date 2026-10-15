@@ -429,11 +429,16 @@ def toggle_starred_book(book_id: str) -> bool:
 # ----------------- Session Management -----------------
 
 def create_session(user_id: int) -> str:
-    """Generates a tamper-proof cryptographic signed session token that works across all instances and reloads."""
+    """Generates a permanent, tamper-proof cryptographic signed session token that works across all instances and reloads."""
     now = int(time.time())
-    payload = f"{user_id}:{now}"
+    user = get_user_by_id(user_id)
+    email = user["email"] if user else ""
+    role = user["role"] if user else "user"
+    unlocked = "1" if (user and user.get("has_unlocked_all")) else "0"
+
+    payload = f"{user_id}:{email}:{role}:{unlocked}:{now}"
     sig = hmac.new(SESSION_SECRET.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()
-    # Format: base64(user_id:timestamp:sig)
+    # Format: base64(payload:sig)
     token = base64.urlsafe_b64encode(f"{payload}:{sig}".encode('utf-8')).decode('utf-8')
     return token
 
@@ -447,7 +452,27 @@ def get_user_by_session(token: str) -> Optional[Dict[str, Any]]:
     try:
         raw = base64.urlsafe_b64decode(token.encode('utf-8')).decode('utf-8')
         parts = raw.split(":")
-        if len(parts) == 3:
+        
+        # New format: user_id:email:role:unlocked:timestamp:sig (6 parts)
+        if len(parts) == 6:
+            user_id_str, email, role, unlocked_str, ts_str, sig = parts
+            payload = f"{user_id_str}:{email}:{role}:{unlocked_str}:{ts_str}"
+            expected_sig = hmac.new(SESSION_SECRET.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()
+            if secrets.compare_digest(sig, expected_sig):
+                user = get_user_by_id(int(user_id_str))
+                if user:
+                    return user
+                # Fallback to cryptographically verified payload (guarantees session never breaks)
+                return {
+                    "id": int(user_id_str),
+                    "email": email,
+                    "role": role,
+                    "has_unlocked_all": (unlocked_str == "1"),
+                    "created_at": ""
+                }
+        
+        # Legacy format: user_id:timestamp:sig (3 parts)
+        elif len(parts) == 3:
             user_id_str, ts_str, sig = parts
             payload = f"{user_id_str}:{ts_str}"
             expected_sig = hmac.new(SESSION_SECRET.encode('utf-8'), payload.encode('utf-8'), hashlib.sha256).hexdigest()

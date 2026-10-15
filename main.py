@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional, List
 
 import pymupdf  # PyMuPDF
 from PIL import Image, ImageFilter
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, BackgroundTasks, Header
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query, BackgroundTasks, Header, Cookie
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -318,11 +318,12 @@ async def get_catalog(
 # ----------------- User Authentication Endpoints -----------------
 
 @app.post("/api/auth/signup")
-async def auth_signup(req: AuthSignupRequest):
-    """Customer registration endpoint stored in SQLite."""
+async def auth_signup(req: AuthSignupRequest, response: Response):
+    """Customer registration endpoint stored in SQLite with persistent session."""
     try:
         user = database.create_user(req.email, req.password, role="customer")
         token = database.create_session(user["id"])
+        response.set_cookie(key="customer_token", value=token, max_age=315360000, httponly=False, samesite="lax")
         return {
             "status": "success",
             "token": token,
@@ -333,12 +334,13 @@ async def auth_signup(req: AuthSignupRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/auth/login")
-async def auth_login(req: AuthLoginRequest):
-    """Customer / Admin login endpoint verified against SQLite."""
+async def auth_login(req: AuthLoginRequest, response: Response):
+    """Customer / Admin login endpoint verified against SQLite with persistent session."""
     user = database.authenticate_user(req.email, req.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password.")
     token = database.create_session(user["id"])
+    response.set_cookie(key="customer_token", value=token, max_age=315360000, httponly=False, samesite="lax")
     return {
         "status": "success",
         "token": token,
@@ -347,19 +349,31 @@ async def auth_login(req: AuthLoginRequest):
     }
 
 @app.get("/api/auth/me")
-async def auth_me(authorization: Optional[str] = Header(None)):
+async def auth_me(
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Query(None),
+    customer_token: Optional[str] = Cookie(None)
+):
     """Returns the current authenticated user's profile and purchase status."""
-    user = get_current_user_from_token(authorization)
+    active_token = authorization or token or customer_token
+    user = get_current_user_from_token(active_token)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated.")
     return {"status": "success", "user": user}
 
 @app.post("/api/auth/logout")
-async def auth_logout(authorization: Optional[str] = Header(None)):
-    """Logs out and invalidates the session token in SQLite."""
-    if authorization:
-        token = authorization.replace("Bearer ", "").strip()
-        database.delete_session(token)
+async def auth_logout(
+    response: Response,
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Query(None),
+    customer_token: Optional[str] = Cookie(None)
+):
+    """Explicit customer logout endpoint that invalidates session and clears cookie."""
+    active_token = authorization or token or customer_token
+    if active_token:
+        clean_token = active_token.replace("Bearer ", "").strip()
+        database.delete_session(clean_token)
+    response.delete_cookie(key="customer_token")
     return {"status": "success", "message": "Logged out successfully."}
 
 # ----------------- Admin Endpoints -----------------
@@ -483,7 +497,8 @@ async def get_book_cover(book_id: str):
 async def get_book_details(
     book_id: str,
     token: Optional[str] = Query(None),
-    authorization: Optional[str] = Header(None)
+    authorization: Optional[str] = Header(None),
+    customer_token: Optional[str] = Cookie(None)
 ):
     """Returns detailed information and page list for a selected book."""
     if book_id not in CATALOG:
@@ -501,7 +516,7 @@ async def get_book_details(
             raise HTTPException(status_code=500, detail=f"Failed to open PDF: {str(e)}")
 
 
-    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
+    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None) or customer_token
     user = database.get_user_by_session(active_token) if active_token else None
 
     # Require customer to sign up / log in before viewing previews
@@ -542,7 +557,8 @@ async def get_book_page(
     page_num: int,
     dpi: int = 144,
     token: Optional[str] = Query(None),
-    authorization: Optional[str] = Header(None)
+    authorization: Optional[str] = Header(None),
+    customer_token: Optional[str] = Cookie(None)
 ):
     """
     Renders and streams a specific page image.
@@ -553,7 +569,7 @@ async def get_book_page(
         raise HTTPException(status_code=404, detail="Book not found.")
 
     book = CATALOG[book_id]
-    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
+    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None) or customer_token
     user = database.get_user_by_session(active_token) if active_token else None
 
     # Require customer to sign up / log in before viewing preview pages
