@@ -208,7 +208,7 @@ function updateGlobalLockBadge() {
   } else {
     if (globalStatusBadge) {
       globalStatusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25';
-      globalStatusBadge.innerHTML = 'Sample Preview Mode';
+      globalStatusBadge.innerHTML = 'Preview Mode';
     }
     if (toggleLockBtnLabel) toggleLockBtnLabel.textContent = 'Demo Unlock';
     if (topUnlockAllBtn) topUnlockAllBtn.classList.remove('hidden');
@@ -454,7 +454,7 @@ function renderPages() {
       pageBar.innerHTML = `
         <div class="flex items-center gap-2 text-emerald-400 font-semibold">
           <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-          <span>Page ${page.page_num} of ${currentBook.page_count} (Sample Preview)</span>
+          <span>Page ${page.page_num} of ${currentBook.page_count} (Preview)</span>
         </div>
         <span class="text-[11px] text-slate-400">Crisp High-Res Vector</span>
       `;
@@ -720,7 +720,7 @@ if (toggleLockDemoBtn) {
     try {
       if (catalogData.global_unlocked) {
         await fetch('/api/catalog/lock-all', { method: 'POST', headers: getAuthHeaders() });
-        showToast('Library re-locked to sample preview mode.', 'info');
+        showToast('Library access re-locked.', 'info');
         catalogData.global_unlocked = false;
       } else {
         await fetch('/api/catalog/unlock-all', {
@@ -948,13 +948,13 @@ function openAuthModal(mode = 'signup', forPreview = false) {
 
   if (forPreview) {
     if (authPreviewNotice) authPreviewNotice.classList.remove('hidden');
-    if (authModalTitle) authModalTitle.textContent = mode === 'signup' ? 'Create Free Account to View Preview' : 'Sign In to View Preview';
-    if (authModalSubtitle) authModalSubtitle.textContent = 'Unlock 2-page sample previews for all 1,000+ crochet patterns';
-    if (authSubmitText) authSubmitText.textContent = mode === 'signup' ? 'Sign Up & View Preview' : 'Sign In & View Preview';
+    if (authModalTitle) authModalTitle.textContent = mode === 'signup' ? 'Create Free Account' : 'Sign In to Pattern Archive';
+    if (authModalSubtitle) authModalSubtitle.textContent = '1,000+ Crochet Patterns';
+    if (authSubmitText) authSubmitText.textContent = mode === 'signup' ? 'Sign Up & View Pattern' : 'Sign In & View Pattern';
   } else {
     if (authPreviewNotice) authPreviewNotice.classList.add('hidden');
     if (authModalTitle) authModalTitle.textContent = mode === 'signup' ? 'Create Customer Account' : 'Welcome to Pattern Archive';
-    if (authModalSubtitle) authModalSubtitle.textContent = 'Save your unlocked patterns permanently';
+    if (authModalSubtitle) authModalSubtitle.textContent = '1,000+ Crochet Patterns';
     if (authSubmitText) authSubmitText.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
   }
 
@@ -1022,7 +1022,7 @@ if (authForm) {
       currentUser = data.user;
       authModal.classList.add('hidden');
 
-      showToast(authMode === 'signup' ? '🎉 Welcome! Your free previews are now active.' : `Welcome back, ${currentUser.email}!`, 'success');
+      showToast(authMode === 'signup' ? '🎉 Welcome! Your account is now active.' : `Welcome back, ${currentUser.email}!`, 'success');
       await checkAuthStatus();
 
       // If customer was opening a preview, open that book immediately!

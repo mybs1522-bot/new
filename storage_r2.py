@@ -32,9 +32,9 @@ if os.path.exists(ENV_FILE):
         print("Error reading .env:", e)
 
 # Configuration from environment
-R2_ACCOUNT_ID = os.getenv("R2_ACCOUNT_ID", "")
-R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID", "")
-R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "")
+R2_ACCOUNT_ID = os.getenv("R2_ACCOUNT_ID", "7120ab501b68c2062741cd41e574b121")
+R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID", "3d262b79676acfd927a976175cb917af")
+R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "9d1fda833632cefa0a068686e46232e8535c084c5a7caea8f5fb880a448114b3")
 R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "crochet")
 R2_CUSTOM_DOMAIN = os.getenv("R2_CUSTOM_DOMAIN", "")
 
@@ -58,13 +58,22 @@ def get_r2_client():
     )
 
 def upload_file_to_r2(local_file_path: str, r2_key: str) -> bool:
-    """Uploads a single local PDF or image file to Cloudflare R2."""
+    """Uploads a single local PDF, DB, or image file to Cloudflare R2."""
     client = get_r2_client()
     if not client:
         return False
     
     try:
-        content_type = "application/pdf" if local_file_path.lower().endswith(".pdf") else "image/jpeg"
+        lower = local_file_path.lower()
+        if lower.endswith(".pdf"):
+            content_type = "application/pdf"
+        elif lower.endswith(".db") or lower.endswith(".sqlite3"):
+            content_type = "application/x-sqlite3"
+        elif lower.endswith(".json"):
+            content_type = "application/json"
+        else:
+            content_type = "image/jpeg"
+
         client.upload_file(
             local_file_path,
             R2_BUCKET_NAME,

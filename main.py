@@ -565,7 +565,7 @@ async def unlock_all_books(
     user = database.get_user_by_session(active_token) if active_token else None
 
     if user:
-        database.record_order(user["id"], f"ORDER-{uuid.uuid4().hex[:8].upper()}", 29.00)
+        database.record_order(user["id"], f"ORDER-{uuid.uuid4().hex[:8].upper()}", 39.00)
     else:
         GLOBAL_UNLOCKED = True
 

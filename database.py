@@ -29,11 +29,58 @@ except OSError:
     os.makedirs(DATA_DIR, exist_ok=True)
 
 
+import time
+
+_last_sync_time = 0
+
+def sync_db_from_r2(force: bool = False) -> bool:
+    """Pulls the latest database file from Cloudflare R2 if available."""
+    global _last_sync_time
+    now = time.time()
+    if not force and (now - _last_sync_time < 5):
+        return False
+    try:
+        import storage_r2
+        if storage_r2.is_r2_configured():
+            temp_db = DB_PATH + ".download.tmp"
+            success = storage_r2.download_file_from_r2("system/library.db", temp_db)
+            if success and os.path.exists(temp_db) and os.path.getsize(temp_db) > 0:
+                try:
+                    if os.path.exists(DB_PATH):
+                        try:
+                            os.remove(DB_PATH)
+                        except Exception:
+                            pass
+                    os.replace(temp_db, DB_PATH)
+                except Exception:
+                    import shutil
+                    shutil.copy2(temp_db, DB_PATH)
+                    try:
+                        os.remove(temp_db)
+                    except Exception:
+                        pass
+                _last_sync_time = now
+                return True
+    except Exception as e:
+        print("Note: Could not restore DB from Cloudflare R2:", e)
+    return False
+
+def sync_db_to_r2() -> bool:
+    """Uploads the current database file to Cloudflare R2 for serverless continuity."""
+    try:
+        import storage_r2
+        if storage_r2.is_r2_configured() and os.path.exists(DB_PATH) and os.path.getsize(DB_PATH) > 0:
+            return storage_r2.upload_file_to_r2(DB_PATH, "system/library.db")
+    except Exception as e:
+        print("Note: Could not sync DB to Cloudflare R2:", e)
+    return False
+
 def get_connection() -> sqlite3.Connection:
     """Returns a connection to the SQLite database with dictionary-like row access."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
     """Hashes a password using PBKDF2-HMAC-SHA256 with 100,000 iterations and a unique salt."""
@@ -54,6 +101,9 @@ def verify_password(password: str, password_hash: str, salt: str) -> bool:
 
 def init_db():
     """Initializes the SQLite schema and seeds the default admin user."""
+    # Restore persistent database from Cloudflare R2 if available
+    sync_db_from_r2(force=True)
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -123,20 +173,23 @@ def init_db():
     cursor.execute("SELECT id FROM users WHERE email = ? OR email = ?", ('admin', 'admin@crochetlibrary.com'))
     admin = cursor.fetchone()
     if not admin:
-        pwd_hash, salt = hash_password("Robbin#00xx")
+        admin_pwd = os.getenv("ADMIN_PASSWORD", "Robbin#00xx")
+        pwd_hash, salt = hash_password(admin_pwd)
         cursor.execute("""
         INSERT INTO users (email, password_hash, salt, role, has_unlocked_all, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
         """, ('admin', pwd_hash, salt, 'admin', 1, datetime.utcnow().isoformat()))
         conn.commit()
-        print("Default admin created: admin / Robbin#00xx")
+        print("Default admin created: admin / " + admin_pwd)
 
     conn.close()
+    sync_db_to_r2()
 
 # ----------------- User Auth Functions -----------------
 
 def create_user(email: str, password: str, role: str = "user") -> Dict[str, Any]:
     """Creates a new user. Raises ValueError if email is taken."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     clean_email = email.strip().lower()
@@ -157,6 +210,9 @@ def create_user(email: str, password: str, role: str = "user") -> Dict[str, Any]
     conn.commit()
     conn.close()
 
+    # Automatically persist new customer to Cloudflare R2
+    sync_db_to_r2()
+
     return {
         "id": user_id,
         "email": clean_email,
@@ -167,6 +223,7 @@ def create_user(email: str, password: str, role: str = "user") -> Dict[str, Any]
 
 def authenticate_user(email_or_username: str, password: str) -> Optional[Dict[str, Any]]:
     """Authenticates a user by email or username."""
+    sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
     query = email_or_username.strip().lower()
@@ -174,6 +231,14 @@ def authenticate_user(email_or_username: str, password: str) -> Optional[Dict[st
     cursor.execute("SELECT * FROM users WHERE lower(email) = ?", (query,))
     user = cursor.fetchone()
     conn.close()
+
+    if not user:
+        sync_db_from_r2(force=True)
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE lower(email) = ?", (query,))
+        user = cursor.fetchone()
+        conn.close()
 
     if not user:
         return None
@@ -190,11 +255,19 @@ def authenticate_user(email_or_username: str, password: str) -> Optional[Dict[st
 
 def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
     """Retrieves a user by their numeric ID."""
+    sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, email, role, has_unlocked_all, created_at FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
     conn.close()
+    if not user:
+        sync_db_from_r2(force=True)
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email, role, has_unlocked_all, created_at FROM users WHERE id = ?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
     if user:
         return {
             "id": user["id"],
@@ -209,11 +282,19 @@ def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Retrieves a user by their email address."""
     if not email:
         return None
+    sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, email, role, has_unlocked_all, created_at FROM users WHERE lower(email) = ?", (email.strip().lower(),))
     row = cursor.fetchone()
     conn.close()
+    if not row:
+        sync_db_from_r2(force=True)
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email, role, has_unlocked_all, created_at FROM users WHERE lower(email) = ?", (email.strip().lower(),))
+        row = cursor.fetchone()
+        conn.close()
     if row:
         return {
             "id": row["id"],
@@ -244,6 +325,7 @@ def unlock_user_catalog(user_id: int) -> bool:
 
 def toggle_user_unlock(user_id: int) -> bool:
     """Toggles unlocked status for a user. Returns new boolean state."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT has_unlocked_all FROM users WHERE id = ?", (user_id,))
@@ -256,10 +338,12 @@ def toggle_user_unlock(user_id: int) -> bool:
     cursor.execute("UPDATE users SET has_unlocked_all = ? WHERE id = ?", (new_val, user_id))
     conn.commit()
     conn.close()
+    sync_db_to_r2()
     return bool(new_val)
 
 def get_all_users() -> List[Dict[str, Any]]:
     """Retrieves all registered users with their order count."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -286,6 +370,7 @@ def get_all_users() -> List[Dict[str, Any]]:
 
 def delete_user(user_id: int) -> bool:
     """Deletes a customer user. Will not delete main admin."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT role FROM users WHERE id = ?", (user_id,))
@@ -302,12 +387,14 @@ def delete_user(user_id: int) -> bool:
     cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
+    sync_db_to_r2()
     return True
 
 # ----------------- Starred Books Functions -----------------
 
 def get_starred_book_ids() -> Set[str]:
     """Returns the set of all starred book IDs from SQLite."""
+    sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT book_id FROM starred_books")
@@ -317,6 +404,7 @@ def get_starred_book_ids() -> Set[str]:
 
 def toggle_starred_book(book_id: str) -> bool:
     """Toggles starred status for a book. Returns True if starred, False if unstarred."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT book_id FROM starred_books WHERE book_id = ?", (book_id,))
@@ -331,6 +419,7 @@ def toggle_starred_book(book_id: str) -> bool:
 
     conn.commit()
     conn.close()
+    sync_db_to_r2()
     return is_starred
 
 # ----------------- Session Management -----------------
@@ -346,12 +435,14 @@ def create_session(user_id: int) -> str:
     """, (token, user_id, datetime.utcnow().isoformat()))
     conn.commit()
     conn.close()
+    sync_db_to_r2()
     return token
 
 def get_user_by_session(token: str) -> Optional[Dict[str, Any]]:
     """Fetches user matching the session token."""
     if not token:
         return None
+    sync_db_from_r2()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -362,6 +453,18 @@ def get_user_by_session(token: str) -> Optional[Dict[str, Any]]:
     """, (token,))
     row = cursor.fetchone()
     conn.close()
+    if not row:
+        sync_db_from_r2(force=True)
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+        SELECT u.id, u.email, u.role, u.has_unlocked_all, u.created_at
+        FROM users u
+        JOIN sessions s ON u.id = s.user_id
+        WHERE s.token = ?
+        """, (token,))
+        row = cursor.fetchone()
+        conn.close()
     if row:
         return {
             "id": row["id"],
@@ -381,9 +484,11 @@ def delete_session(token: str):
     cursor.execute("DELETE FROM sessions WHERE token = ?", (token,))
     conn.commit()
     conn.close()
+    sync_db_to_r2()
 
-def record_order(user_id: int, order_ref: str, amount: float = 29.00) -> bool:
+def record_order(user_id: int, order_ref: str, amount: float = 39.00) -> bool:
     """Records order and unlocks catalog for user."""
+    sync_db_from_r2(force=True)
     conn = get_connection()
     cursor = conn.cursor()
     now = datetime.utcnow().isoformat()
@@ -394,5 +499,6 @@ def record_order(user_id: int, order_ref: str, amount: float = 29.00) -> bool:
     cursor.execute("UPDATE users SET has_unlocked_all = 1 WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
+    sync_db_to_r2()
     return True
 
