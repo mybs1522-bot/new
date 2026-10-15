@@ -13,10 +13,21 @@ import secrets
 from datetime import datetime
 from typing import Optional, List, Set, Dict, Any
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+IS_SERVERLESS = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+if IS_SERVERLESS:
+    DATA_DIR = "/tmp/data"
+else:
+    DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
 DB_PATH = os.path.join(DATA_DIR, "library.db")
 
-os.makedirs(DATA_DIR, exist_ok=True)
+try:
+    os.makedirs(DATA_DIR, exist_ok=True)
+except OSError:
+    DATA_DIR = "/tmp/data"
+    DB_PATH = os.path.join(DATA_DIR, "library.db")
+    os.makedirs(DATA_DIR, exist_ok=True)
+
 
 def get_connection() -> sqlite3.Connection:
     """Returns a connection to the SQLite database with dictionary-like row access."""

@@ -26,10 +26,26 @@ app.add_middleware(
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-CACHE_DIR = os.path.join(BASE_DIR, "cache")
+
+IS_SERVERLESS = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+if IS_SERVERLESS:
+    CACHE_DIR = "/tmp/cache"
+else:
+    CACHE_DIR = os.path.join(BASE_DIR, "cache")
+
 THUMBNAILS_DIR = os.path.join(CACHE_DIR, "thumbnails")
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(THUMBNAILS_DIR, exist_ok=True)
+
+try:
+    os.makedirs(STATIC_DIR, exist_ok=True)
+except OSError:
+    pass
+
+try:
+    os.makedirs(THUMBNAILS_DIR, exist_ok=True)
+except OSError:
+    THUMBNAILS_DIR = "/tmp/cache/thumbnails"
+    os.makedirs(THUMBNAILS_DIR, exist_ok=True)
+
 
 # Default path provided by user
 DEFAULT_FOLDER = r"F:\1000+ Crochet Patterns-20261011T190538Z-1-001\1000+ Crochet Patterns"
@@ -130,28 +146,32 @@ def scan_directory(folder_path: str = DEFAULT_FOLDER):
 
     # 2. Cloud Fallback: If deployed to cloud where local F: drive is absent, load directly from Cloudflare R2!
     if storage_r2.is_r2_configured():
-        print("Local folder not found. Loading catalog directly from Cloudflare R2 storage bucket...")
-        CURRENT_FOLDER = "Cloudflare R2 Bucket (crochet)"
-        CATALOG.clear()
-        r2_patterns = storage_r2.list_patterns_from_r2()
-        r2_patterns.sort(key=lambda p: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', p["filename"])])
+        try:
+            print("Local folder not found. Loading catalog directly from Cloudflare R2 storage bucket...")
+            CURRENT_FOLDER = "Cloudflare R2 Bucket (crochet)"
+            CATALOG.clear()
+            r2_patterns = storage_r2.list_patterns_from_r2()
+            r2_patterns.sort(key=lambda p: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', p["filename"])])
 
-        for p in r2_patterns:
-            fname = p["filename"]
-            book_id = hashlib.md5(fname.encode('utf-8')).hexdigest()[:12]
-            title = clean_title(fname)
-            CATALOG[book_id] = {
-                "id": book_id,
-                "filename": fname,
-                "title": title,
-                "filepath": None,
-                "file_size": p.get("size", 0),
-                "page_count": None,
-                "unlocked": False,
-                "is_uploaded": False
-            }
-        print(f"Catalog loaded from Cloudflare R2: {len(CATALOG)} books.")
-        return len(CATALOG)
+            for p in r2_patterns:
+                fname = p["filename"]
+                book_id = hashlib.md5(fname.encode('utf-8')).hexdigest()[:12]
+                title = clean_title(fname)
+                CATALOG[book_id] = {
+                    "id": book_id,
+                    "filename": fname,
+                    "title": title,
+                    "filepath": None,
+                    "file_size": p.get("size", 0),
+                    "page_count": None,
+                    "unlocked": False,
+                    "is_uploaded": False
+                }
+            print(f"Catalog loaded from Cloudflare R2: {len(CATALOG)} books.")
+            return len(CATALOG)
+        except Exception as e:
+            print(f"Error loading catalog from Cloudflare R2 on startup: {e}")
+            return 0
 
     return 0
 
