@@ -56,6 +56,10 @@ const authErrorMsg = document.getElementById('authErrorMsg');
 const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authSubmitText = document.getElementById('authSubmitText');
 const authModalTitle = document.getElementById('authModalTitle');
+const authModalSubtitle = document.getElementById('authModalSubtitle');
+const authPreviewNotice = document.getElementById('authPreviewNotice');
+let pendingPreviewBookId = null;
+
 
 // Catalog Elements
 const booksGrid = document.getElementById('booksGrid');
@@ -271,6 +275,10 @@ function renderCatalogGrid() {
     `;
 
     card.addEventListener('click', () => {
+      if (!customerToken || !currentUser) {
+        requireAuthForPreview(book.id);
+        return;
+      }
       openBookReader(book.id);
     });
 
@@ -311,14 +319,23 @@ sortSelect.addEventListener('change', () => {
 // Reader Logic
 // -------------------------------------------------------------
 async function openBookReader(bookId) {
+  if (!customerToken || !currentUser) {
+    requireAuthForPreview(bookId);
+    return;
+  }
   try {
     showToast('Loading crochet pattern...', 'info');
     const url = `/api/catalog/${bookId}` + (customerToken ? `?token=${encodeURIComponent(customerToken)}` : '');
     const res = await fetch(url, { headers: getAuthHeaders() });
+    if (res.status === 401) {
+      requireAuthForPreview(bookId);
+      return;
+    }
     if (!res.ok) throw new Error('Failed to load book details');
     
     currentBook = await res.json();
     activePageIndex = 0;
+
 
     // Switch views
     catalogSection.classList.add('hidden');
@@ -923,38 +940,61 @@ function initFloatingCrochetHero() {
   requestAnimationFrame(updatePhysics);
 }
 
-// Auth Modal Event Handlers
+// Auth Modal & Preview Signup Gate Handlers
+function openAuthModal(mode = 'signup', forPreview = false) {
+  authMode = mode;
+  if (authErrorMsg) authErrorMsg.classList.add('hidden');
+  if (authModal) authModal.classList.remove('hidden');
+
+  if (forPreview) {
+    if (authPreviewNotice) authPreviewNotice.classList.remove('hidden');
+    if (authModalTitle) authModalTitle.textContent = mode === 'signup' ? 'Create Free Account to View Preview' : 'Sign In to View Preview';
+    if (authModalSubtitle) authModalSubtitle.textContent = 'Unlock 2-page sample previews for all 1,000+ crochet patterns';
+    if (authSubmitText) authSubmitText.textContent = mode === 'signup' ? 'Sign Up & View Preview' : 'Sign In & View Preview';
+  } else {
+    if (authPreviewNotice) authPreviewNotice.classList.add('hidden');
+    if (authModalTitle) authModalTitle.textContent = mode === 'signup' ? 'Create Customer Account' : 'Welcome to Pattern Archive';
+    if (authModalSubtitle) authModalSubtitle.textContent = 'Save your unlocked patterns permanently';
+    if (authSubmitText) authSubmitText.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+  }
+
+  if (mode === 'signup') {
+    if (tabSignUp) tabSignUp.className = 'flex-1 py-1.5 rounded-md font-semibold bg-white text-zinc-950 transition';
+    if (tabSignIn) tabSignIn.className = 'flex-1 py-1.5 rounded-md font-medium text-zinc-400 hover:text-white transition';
+  } else {
+    if (tabSignIn) tabSignIn.className = 'flex-1 py-1.5 rounded-md font-semibold bg-white text-zinc-950 transition';
+    if (tabSignUp) tabSignUp.className = 'flex-1 py-1.5 rounded-md font-medium text-zinc-400 hover:text-white transition';
+  }
+
+  refreshIcons();
+}
+
+function requireAuthForPreview(bookId) {
+  pendingPreviewBookId = bookId;
+  openAuthModal('signup', true);
+}
+
 if (openAuthModalBtn) {
   openAuthModalBtn.addEventListener('click', () => {
-    authModal.classList.remove('hidden');
-    authErrorMsg.classList.add('hidden');
-    refreshIcons();
+    pendingPreviewBookId = null;
+    openAuthModal('login', false);
   });
 }
 
 if (closeAuthModalBtn) {
   closeAuthModalBtn.addEventListener('click', () => {
     authModal.classList.add('hidden');
+    pendingPreviewBookId = null;
   });
 }
 
 if (tabSignIn && tabSignUp) {
   tabSignIn.addEventListener('click', () => {
-    authMode = 'login';
-    tabSignIn.className = 'flex-1 py-1.5 rounded-md font-semibold bg-white text-zinc-950 transition';
-    tabSignUp.className = 'flex-1 py-1.5 rounded-md font-medium text-zinc-400 hover:text-white transition';
-    authModalTitle.textContent = 'Welcome to Pattern Archive';
-    authSubmitText.textContent = 'Sign In';
-    authErrorMsg.classList.add('hidden');
+    openAuthModal('login', !!pendingPreviewBookId);
   });
 
   tabSignUp.addEventListener('click', () => {
-    authMode = 'signup';
-    tabSignUp.className = 'flex-1 py-1.5 rounded-md font-semibold bg-white text-zinc-950 transition';
-    tabSignIn.className = 'flex-1 py-1.5 rounded-md font-medium text-zinc-400 hover:text-white transition';
-    authModalTitle.textContent = 'Create Customer Account';
-    authSubmitText.textContent = 'Create Account';
-    authErrorMsg.classList.add('hidden');
+    openAuthModal('signup', !!pendingPreviewBookId);
   });
 }
 
@@ -981,9 +1021,18 @@ if (authForm) {
       localStorage.setItem('customer_token', customerToken);
       currentUser = data.user;
       authModal.classList.add('hidden');
-      showToast(authMode === 'signup' ? '🎉 Account created! Welcome!' : `Welcome back, ${currentUser.email}!`, 'success');
+
+      showToast(authMode === 'signup' ? '🎉 Welcome! Your free previews are now active.' : `Welcome back, ${currentUser.email}!`, 'success');
       await checkAuthStatus();
-      await fetchCatalog(catalogData.page);
+
+      // If customer was opening a preview, open that book immediately!
+      if (pendingPreviewBookId) {
+        const targetBookId = pendingPreviewBookId;
+        pendingPreviewBookId = null;
+        await openBookReader(targetBookId);
+      } else {
+        await fetchCatalog(catalogData.page);
+      }
     } catch (err) {
       authErrorMsg.textContent = err.message;
       authErrorMsg.classList.remove('hidden');

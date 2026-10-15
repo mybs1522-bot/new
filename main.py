@@ -460,12 +460,19 @@ async def get_book_details(
             raise HTTPException(status_code=500, detail=f"Failed to open PDF: {str(e)}")
 
 
-    page_count = book["page_count"]
     active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
     user = database.get_user_by_session(active_token) if active_token else None
+
+    # Require customer to sign up / log in before viewing previews
+    if not user and not GLOBAL_UNLOCKED:
+        raise HTTPException(
+            status_code=401,
+            detail="Please create a free account or sign in to view pattern previews."
+        )
+
     user_unlocked = GLOBAL_UNLOCKED or (user is not None and user.get("has_unlocked_all", False))
     is_unlocked = user_unlocked or book["unlocked"]
-
+    page_count = book["page_count"] or 0
     pages = []
     for i in range(page_count):
         is_blurred = (i >= 2) and (not is_unlocked)
@@ -507,8 +514,17 @@ async def get_book_page(
     book = CATALOG[book_id]
     active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
     user = database.get_user_by_session(active_token) if active_token else None
+
+    # Require customer to sign up / log in before viewing preview pages
+    if not user and not GLOBAL_UNLOCKED:
+        raise HTTPException(
+            status_code=401,
+            detail="Please create a free account or sign in to view pattern previews."
+        )
+
     user_unlocked = GLOBAL_UNLOCKED or (user is not None and user.get("has_unlocked_all", False))
     is_unlocked = user_unlocked or book["unlocked"]
+
 
     try:
         doc = get_pdf_document(book)
