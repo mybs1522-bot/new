@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crochet Pattern Archive • Curated Collection</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#090a0c',
+              card: '#121316',
+              border: 'rgba(255, 255, 255, 0.08)',
+              subtle: '#18191e',
+              muted: '#8a8d95'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-[#090a0c] text-zinc-100 min-h-screen flex flex-col font-sans antialiased selection:bg-zinc-700 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#090a0c]/90 backdrop-blur-md px-4 lg:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <!-- Back to Library Button (Only visible in reader mode) -->
+      <button id="backToLibraryBtn" class="hidden items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs font-medium transition border border-white/10 shadow-sm">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-zinc-400"></i>
+        <span>Back to Archive</span>
+      </button>
+
+      <div class="h-8 w-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-200 shrink-0">
+        <i data-lucide="scissors" class="w-4 h-4"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm tracking-tight text-zinc-100">Pattern Archive</span>
+          <span id="globalStatusBadge" class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-900 text-zinc-400 border border-white/10">
+            Preview Mode
+          </span>
+        </div>
+        <p id="topSubheader" class="text-xs text-zinc-500 truncate max-w-[200px] sm:max-w-md">1,000+ Curated Crochet Collection</p>
+      </div>
+    </div>
+
+    <!-- Reader Bar Controls (Visible only when reading a book) -->
+    <div id="readerToolbar" class="hidden items-center gap-2 sm:gap-3">
+      <div class="flex items-center bg-zinc-900 border border-white/10 rounded-lg p-1 text-xs">
+        <button id="zoomOutBtn" title="Zoom Out" class="p-1.5 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white transition">
+          <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
+        </button>
+        <span id="zoomLevelText" class="px-2 font-mono text-zinc-300 text-xs">100%</span>
+        <button id="zoomInBtn" title="Zoom In" class="p-1.5 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white transition">
+          <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- Export Dropdown -->
+      <div class="relative">
+        <button id="downloadDropdownBtn" class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-lg text-xs font-medium text-zinc-300 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-zinc-400"></i>
+          <span>Export</span>
+          <i data-lucide="chevron-down" class="w-3 h-3 text-zinc-500"></i>
+        </button>
+        <div id="downloadMenu" class="hidden absolute right-0 mt-2 w-64 bg-[#121316] border border-white/10 rounded-xl shadow-2xl p-1.5 z-50">
+          <button id="downloadPreviewBtn" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-zinc-800/70 flex items-center gap-2.5 transition text-zinc-200">
+            <i data-lucide="file-text" class="w-4 h-4 text-zinc-400 shrink-0"></i>
+            <div>
+              <div class="font-medium text-zinc-100">Download Preview PDF</div>
+              <div class="text-[10px] text-zinc-500">Includes watermarked sample pages</div>
+            </div>
+          </button>
+          <button id="downloadFullBtn" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-zinc-800/70 flex items-center gap-2.5 transition text-zinc-200 opacity-60">
+            <i data-lucide="file-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <div>
+              <div class="font-medium text-zinc-100">Download Full Pattern PDF</div>
+              <div class="text-[10px] text-zinc-500" id="downloadFullStatusText">Requires unlocked archive</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- User Auth State Button / Profile -->
+      <div id="userAuthContainer" class="flex items-center">
+        <button id="openAuthModalBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-zinc-300 transition">
+          <i data-lucide="user" class="w-3.5 h-3.5 text-zinc-400"></i>
+          <span>Sign In / Sign Up</span>
+        </button>
+        <div id="userProfilePill" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-zinc-900 border border-white/10 text-zinc-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="userEmailLabel" class="font-medium text-white max-w-[120px] sm:max-w-[160px] truncate"></span>
+          <span id="userAccessBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">Free</span>
+          <button id="userLogoutBtn" title="Sign Out" class="text-zinc-500 hover:text-rose-400 ml-1 transition">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Demo Toggle -->
+      <button id="toggleLockDemoBtn" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-zinc-400 hover:text-zinc-200 transition">
+        <i data-lucide="key" class="w-3.5 h-3.5 text-zinc-400"></i>
+        <span id="toggleLockBtnLabel">Demo Unlock</span>
+      </button>
+
+      <!-- Hero Unlock Button -->
+      <button id="topUnlockAllBtn" class="flex items-center gap-2 px-4 py-1.5 rounded-lg font-medium text-xs text-zinc-950 bg-white hover:bg-zinc-200 shadow-sm transition">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-zinc-700"></i>
+        <span>Get Lifetime All-Access ($39)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewports -->
+  <main class="flex-1 flex flex-col overflow-hidden relative">
+
+    <!-- VIEW 1: CATALOG / STOREFRONT GRID -->
+    <section id="catalogSection" class="flex-1 flex flex-col overflow-y-auto bg-[#090a0c] px-4 sm:px-8 py-6">
+      
+      <!-- Catalog Container -->
+      <div class="max-w-7xl w-full mx-auto space-y-8">
+        
+        <!-- Premium Minimalist Hero Section -->
+        <section id="floatingHeroSection" class="relative w-full min-h-[420px] md:min-h-[480px] flex items-center justify-center overflow-hidden bg-[#101114] rounded-2xl border border-white/[0.07] p-6 sm:p-12 select-none">
+          <!-- Subtle Monochrome Craft Accents -->
+          <div id="floatingIconsContainer" class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none sm:pointer-events-auto">
+            <!-- Rendered by app.js with clean monochromatic line-art icons -->
+          </div>
+
+          <!-- Foreground Hero Content -->
+          <div class="relative z-10 text-center px-4 max-w-2xl mx-auto space-y-4 pointer-events-auto">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-white/10 text-zinc-400 text-[11px] font-medium tracking-wider uppercase">
+              Curated Digital Treasury
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-white leading-tight">
+              Where Every Stitch Comes to Life
+            </h1>
+
+            <p class="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto leading-relaxed">
+              Explore 948 master patterns, amigurumi guides, and stitch charts. Available in high-resolution vector PDF.
+            </p>
+
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button id="bannerUnlockBtn" class="w-full sm:w-auto py-3 px-6 rounded-xl font-medium text-xs sm:text-sm text-zinc-950 bg-white hover:bg-zinc-200 shadow-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-zinc-600"></i>
+                <span>Get Lifetime All-Access — $39 (One-Time)</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#111215] p-3 rounded-xl border border-white/[0.07]">
+          
+          <!-- Search input -->
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="Search patterns (e.g. Doll, Frog, Hat, Grinch)..." 
+              class="w-full pl-9 pr-4 py-2 bg-[#090a0c] border border-white/10 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 transition"
+            />
+          </div>
+
+          <!-- Stats & Sorting -->
+          <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 text-xs text-zinc-400">
+            <span id="catalogCountText" class="font-normal text-zinc-400">Loading patterns...</span>
+            
+            <div class="flex items-center gap-1.5">
+              <span>Sort:</span>
+              <select id="sortSelect" class="bg-[#090a0c] border border-white/10 rounded-md px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none">
+                <option value="name">Name (A-Z)</option>
+                <option value="size">File Size</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Grid (Strict 9:16 Portrait Aspect Ratio) -->
+        <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 sm:gap-6">
+          <!-- Populated by JavaScript with 9:16 portrait cards -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="paginationContainer" class="flex items-center justify-center gap-3 pt-6 pb-16">
+          <button id="prevCatalogPageBtn" class="px-3.5 py-2 bg-[#121316] hover:bg-zinc-800 border border-white/10 rounded-lg text-xs font-medium text-zinc-300 disabled:opacity-30 transition flex items-center gap-1">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Previous
+          </button>
+          
+          <span class="text-xs text-zinc-400 font-medium">
+            Page <span id="currentCatalogPage" class="text-zinc-100 font-bold">1</span> of <span id="totalCatalogPages">1</span>
+          </span>
+
+          <button id="nextCatalogPageBtn" class="px-3.5 py-2 bg-[#121316] hover:bg-zinc-800 border border-white/10 rounded-lg text-xs font-medium text-zinc-300 disabled:opacity-30 transition flex items-center gap-1">
+            Next <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- VIEW 2: ACTIVE READER VIEW -->
+    <section id="readerSection" class="hidden flex-1 flex flex-row overflow-hidden">
+      
+      <!-- Left Thumbnail Sidebar -->
+      <aside id="thumbnailSidebar" class="w-44 md:w-56 shrink-0 border-r border-white/[0.08] bg-[#0c0d10] flex flex-col overflow-hidden">
+        <div class="p-3 border-b border-white/[0.08] flex items-center justify-between text-xs text-zinc-400 font-medium">
+          <span>PAGES (<span id="sidebarPageCount">0</span>)</span>
+          <span id="sidebarLockedCount" class="text-zinc-500 font-normal">Locked: 0</span>
+        </div>
+        <div id="thumbnailList" class="flex-1 overflow-y-auto p-3 space-y-3">
+          <!-- Thumbnails injected via JS -->
+        </div>
+      </aside>
+
+      <!-- Center Document Viewport -->
+      <div id="viewportContainer" class="flex-1 h-full overflow-y-auto bg-[#090a0c] p-4 sm:p-8 flex flex-col items-center">
+        
+        <!-- Floating Navigation / Page Indicator -->
+        <div class="sticky top-2 z-30 mb-4 px-4 py-1.5 rounded-full bg-[#121316]/90 border border-white/10 backdrop-blur-md shadow-xl flex items-center gap-3 text-xs">
+          <button id="prevPageBtn" class="p-1 hover:bg-zinc-800 rounded text-zinc-400 disabled:opacity-30">
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+          </button>
+          <span class="text-zinc-400 font-medium">Page <span id="currentPageNum" class="text-zinc-100 font-bold">1</span> of <span id="totalPageNum">1</span></span>
+          <button id="nextPageBtn" class="p-1 hover:bg-zinc-800 rounded text-zinc-400 disabled:opacity-30">
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <!-- Pages Container -->
+        <div id="documentPagesContainer" class="w-full max-w-3xl flex flex-col items-center gap-8 pb-16">
+          <!-- Pages rendered here -->
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: PAYWALL & SUBSCRIPTION CHECKOUT -->
+  <div id="paywallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+    <div class="bg-[#121316] max-w-md w-full rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-7 relative overflow-hidden">
+      
+      <!-- Close Button -->
+      <button id="closePaywallModalBtn" class="absolute top-4 right-4 p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Header Icon -->
+      <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center mb-4 text-zinc-200">
+        <i data-lucide="lock" class="w-5 h-5"></i>
+      </div>
+
+      <h3 class="text-lg font-semibold text-white mb-1">Lifetime All-Access Pass</h3>
+      <p class="text-xs text-zinc-400 mb-5">
+        One-time payment of $39 for permanent access to the complete 1,000+ Crochet Pattern Treasury & all future updates.
+      </p>
+
+      <!-- Pricing Card -->
+      <div class="mb-5 p-4 rounded-xl border border-white/20 bg-zinc-900/70 relative">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-white">Lifetime Archive Pass</span>
+            <span class="px-2 py-0.5 rounded text-[9px] bg-white text-zinc-950 font-bold tracking-wider">ONE-TIME</span>
+          </div>
+          <div class="text-right">
+            <span class="text-xl font-bold text-white">$39</span>
+            <span class="text-[10px] text-zinc-400">USD</span>
+          </div>
+        </div>
+        <div class="text-[11px] text-zinc-400">Pay once, own forever. Zero recurring subscriptions or hidden fees.</div>
+      </div>
+
+      <!-- Features Checklist -->
+      <div class="space-y-2.5 text-xs text-zinc-300 mb-6 bg-zinc-900/40 p-3.5 rounded-xl border border-white/[0.06]">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>Instant unblur on all 948+ crochet pattern PDFs</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>Direct high-speed downloads via Cloudflare R2 CDN</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>High-resolution vector stitch charts & printable sheets</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>Lifetime access to all future pattern releases</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="space-y-3">
+        <button id="confirmUnlockBtn" class="w-full py-3.5 px-4 rounded-xl font-semibold text-xs text-zinc-950 bg-white hover:bg-zinc-200 shadow-lg transition flex items-center justify-center gap-2">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span>Pay $39 with Stripe — Lifetime All-Access</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <input type="text" id="promoCodeInput" placeholder="Promo code or email" class="flex-1 bg-[#090a0c] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-400" />
+          <button id="applyPromoBtn" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-xs font-medium rounded-lg text-zinc-300 border border-white/10 transition">
+            Apply
+          </button>
+        </div>
+      </div>
+
+      <p class="text-center text-[10px] text-zinc-500 mt-4 flex items-center justify-center gap-1.5">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-zinc-400"></i>
+        <span>256-bit Encrypted Checkout via Stripe • Cards, Apple Pay, Google Pay</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- CUSTOMER AUTH MODAL (SIGN IN / SIGN UP) -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="relative w-full max-w-sm bg-[#121316] border border-white/10 rounded-2xl shadow-2xl p-6 text-zinc-200">
+      <button id="closeAuthModalBtn" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-200">
+          <i data-lucide="lock" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white tracking-tight" id="authModalTitle">Welcome to Pattern Archive</h3>
+          <p class="text-[11px] text-zinc-400">Save your unlocked patterns permanently</p>
+        </div>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="flex rounded-lg bg-zinc-900/80 p-1 mb-4 border border-white/5 text-xs">
+        <button id="tabSignIn" class="flex-1 py-1.5 rounded-md font-semibold bg-white text-zinc-950 transition">
+          Sign In
+        </button>
+        <button id="tabSignUp" class="flex-1 py-1.5 rounded-md font-medium text-zinc-400 hover:text-white transition">
+          Create Account
+        </button>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="authForm" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="you@example.com"
+            class="w-full bg-[#090a0c] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-400 transition" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+          <input type="password" id="authPassword" required placeholder="••••••••"
+            class="w-full bg-[#090a0c] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-400 transition" />
+        </div>
+
+        <div id="authErrorMsg" class="hidden text-[11px] text-rose-400 bg-rose-950/30 border border-rose-900/40 rounded-lg p-2"></div>
+
+        <button type="submit" id="authSubmitBtn"
+          class="w-full py-2.5 rounded-xl font-semibold text-xs text-zinc-950 bg-white hover:bg-zinc-200 transition flex items-center justify-center gap-1.5">
+          <span id="authSubmitText">Sign In</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-900 border border-white/10 shadow-2xl text-xs text-zinc-200 transition-all duration-300">
+    <div id="toastIcon"></div>
+    <span id="toastMsg">Processing...</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

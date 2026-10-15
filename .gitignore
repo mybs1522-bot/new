@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Environment Variables (Keep your secrets safe!)
+.env
+
+# Application Cache and SQLite database
+cache/
+data/*.db
+data/*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db

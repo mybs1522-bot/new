@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+cache/
+data/*.db
+data/*.sqlite3
+start_server.bat
