@@ -1,31 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crochet Course for Beginners in English • 100% Free Masterclass</title>
-  <meta name="description" content="Learn to crochet from scratch in clear, simple English. 34 step-by-step video lessons and 20 projects including bags, baby shoes, and amigurumi. 100% Free Lifetime Access." />
+  <title>Crochet Course for Beginners in English • 100% Free Masterclass by Olivia Pant</title>
+  <meta name="description" content="Learn to crochet from scratch in clear, simple English with Olivia Pant. 34 step-by-step video lessons and 20 projects including bags, baby shoes, and amigurumi. 100% Free Lifetime Access." />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            app: {
-              bg: '#090a0c',
-              card: '#121316',
-              border: 'rgba(255, 255, 255, 0.08)',
-              subtle: '#18191e',
-              muted: '#8a8d95'
-            },
             craft: {
-              rose: '#D63384',
-              roseHover: '#B02468',
-              pinkSoft: '#FFF0F7',
-              pinkBorder: '#F9D3E5'
+              bg: '#FFF8FA',
+              card: '#FFFFFF',
+              cardSoft: '#FFF0F7',
+              border: '#F9D3E5',
+              borderLight: '#FCE7F0',
+              text: '#2B2420',
+              muted: '#6B5E57',
+              rose: '#B02468',
+              roseHover: '#8E1C53',
+              pinkSoft: '#FFF0F7'
             }
           }
         }
@@ -41,56 +39,57 @@
     /* Custom styling for lesson accordion and smooth cards */
     details > summary { list-style: none; }
     details > summary::-webkit-details-marker { display: none; }
-    .glass-card {
-      background: rgba(18, 19, 22, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .light-card {
+      background: #FFFFFF;
+      border: 1px solid #F9D3E5;
+      box-shadow: 0 2px 8px -2px rgba(176, 36, 104, 0.05);
     }
     .video-glow {
-      box-shadow: 0 20px 50px -15px rgba(214, 51, 132, 0.25);
+      box-shadow: 0 15px 40px -10px rgba(176, 36, 104, 0.18);
     }
   </style>
 </head>
-<body class="bg-[#090a0c] text-zinc-100 min-h-screen flex flex-col font-sans antialiased selection:bg-pink-900 selection:text-white pb-20 sm:pb-0">
+<body class="bg-[#FFF8FA] text-[#2B2420] min-h-screen flex flex-col font-sans antialiased selection:bg-pink-100 selection:text-pink-900 pb-20 sm:pb-0">
 
   <!-- ================= TOP NAVBAR ================= -->
-  <header class="sticky top-0 z-40 w-full bg-[#090a0c]/90 backdrop-blur-md border-b border-white/[0.08]">
+  <header class="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-[#F9D3E5]">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
       
       <!-- Brand & Title -->
       <div class="flex items-center gap-3">
-        <a href="/" class="flex items-center gap-2 group">
-          <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/25 flex items-center justify-center text-pink-400 group-hover:scale-105 transition">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-pink-50 border border-pink-200 flex items-center justify-center text-[#B02468] group-hover:scale-105 transition shadow-xs">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
           </div>
           <div>
-            <div class="font-bold text-sm tracking-tight text-white flex items-center gap-2">
+            <div class="font-bold text-sm tracking-tight text-[#2B2420] flex items-center gap-2">
               <span>Crochet Masterclass</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">100% FREE</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">100% FREE</span>
             </div>
-            <p class="text-[11px] text-zinc-400">Complete Beginner to Pro Video Series</p>
+            <p class="text-[11px] text-[#6B5E57]">Taught by Olivia Pant • Beginner to Pro</p>
           </div>
         </a>
       </div>
 
       <!-- Nav Links -->
-      <nav class="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-medium">
-        <a href="#curriculum" class="hover:text-white transition">Curriculum</a>
-        <a href="#projects" class="hover:text-white transition">20 Projects</a>
-        <a href="#starter-kit" class="hover:text-white transition">Starter Kit</a>
-        <a href="#reviews" class="hover:text-white transition">Reviews</a>
-        <a href="#faq" class="hover:text-white transition">FAQ</a>
+      <nav class="hidden md:flex items-center gap-6 text-xs text-[#6B5E57] font-medium">
+        <a href="#curriculum" class="hover:text-[#B02468] transition">Curriculum</a>
+        <a href="#projects" class="hover:text-[#B02468] transition">20 Projects</a>
+        <a href="#starter-kit" class="hover:text-[#B02468] transition">Starter Kit</a>
+        <a href="#tutor" class="hover:text-[#B02468] transition">Instructor</a>
+        <a href="#reviews" class="hover:text-[#B02468] transition">Reviews</a>
+        <a href="#faq" class="hover:text-[#B02468] transition">FAQ</a>
       </nav>
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-3">
-        <a href="/" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 transition">
-          <i data-lucide="book-open" class="w-3.5 h-3.5 text-zinc-400"></i>
+        <a href="/" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#2B2420] hover:text-[#B02468] bg-[#FFF0F7] hover:bg-[#FCE3EE] border border-[#F9D3E5] transition">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-[#B02468]"></i>
           <span class="hidden sm:inline">1,000+ Patterns</span> Library
         </a>
-        <a href="#video-player" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-pink-600 hover:bg-pink-500 shadow-md transition">
+        <a href="#video-player" class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-[#B02468] hover:bg-[#8E1C53] shadow-sm hover:shadow transition">
           <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
-          <span>Watch Lessons Free</span>
+          <span>Watch Free</span>
         </a>
       </div>
 
@@ -100,66 +99,66 @@
   <main class="flex-1">
 
     <!-- ================= HERO SECTION ================= -->
-    <section class="relative overflow-hidden pt-8 pb-16 sm:py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-radial from-pink-950/20 via-transparent to-transparent">
+    <section class="relative overflow-hidden pt-10 pb-16 sm:py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-gradient-to-b from-[#FFF0F7] via-[#FFF8FA] to-white">
       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
         
         <!-- Left Hero Copy -->
         <div class="lg:col-span-7 space-y-6">
           
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-pink-500/10 text-pink-400 border border-pink-500/25">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-pink-100 text-[#B02468] border border-pink-200 shadow-xs">
             <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
-            <span>BEGINNER CROCHET MASTERCLASS · TAUGHT IN ENGLISH</span>
+            <span>BEGINNER CROCHET MASTERCLASS · TAUGHT BY OLIVIA PANT</span>
           </div>
 
-          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
-            Learn to crochet from scratch and make <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-300">20 beautiful projects</span>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#2B2420] leading-[1.18]">
+            Learn to crochet from scratch and make <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#B02468] to-[#D63384]">20 beautiful projects</span>
           </h1>
 
-          <p class="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-2xl">
-            Never held a hook? Gave up on confusing, disorganized YouTube tutorials? This full masterclass takes you from your very first slip knot to baby frocks, sling bags, and an amigurumi bunny — one short, clear, beginner-friendly video at a time.
+          <p class="text-sm sm:text-base text-[#5A4D46] leading-relaxed max-w-2xl">
+            Never held a hook? Confused by disjointed tutorials? Master artisan <strong>Olivia Pant</strong> guides you step-by-step from your very first slip knot all the way to intricate bags, baby booties, and an amigurumi bunny — in clear, conversational English.
           </p>
 
           <!-- Free Price Banner Box -->
-          <div class="p-4 rounded-2xl bg-zinc-900/90 border border-white/10 flex flex-wrap items-center justify-between gap-4 max-w-xl">
+          <div class="p-5 rounded-2xl bg-white border border-[#F9D3E5] shadow-sm flex flex-wrap items-center justify-between gap-4 max-w-xl">
             <div class="space-y-1">
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Masterclass Enrollment Price</div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-[#6B5E57]">Masterclass Access Fee</div>
               <div class="flex items-baseline gap-2.5">
-                <span class="text-3xl font-extrabold text-emerald-400">100% FREE</span>
-                <span class="text-sm text-zinc-500 line-through">₹1,999 ($49)</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ZERO COST</span>
+                <span class="text-3xl font-extrabold text-emerald-600">100% FREE</span>
+                <span class="text-sm text-zinc-400 line-through">₹1,999 ($49)</span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">ZERO COST</span>
               </div>
             </div>
-            <a href="#video-player" class="px-5 py-2.5 rounded-xl font-bold text-xs text-zinc-950 bg-white hover:bg-zinc-200 transition flex items-center gap-2 shadow-lg">
-              <i data-lucide="play" class="w-3.5 h-3.5 text-zinc-950 fill-current"></i>
+            <a href="#video-player" class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-[#B02468] hover:bg-[#8E1C53] transition flex items-center gap-2 shadow-sm">
+              <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
               <span>Start Learning Free</span>
             </a>
           </div>
 
           <!-- CTAs & Trust Badges -->
           <div class="flex flex-wrap items-center gap-4 pt-1">
-            <a href="#video-player" class="px-6 py-3 rounded-xl font-bold text-xs text-white bg-pink-600 hover:bg-pink-500 transition flex items-center gap-2 shadow-lg">
+            <a href="#video-player" class="px-6 py-3 rounded-xl font-bold text-xs text-white bg-[#B02468] hover:bg-[#8E1C53] transition flex items-center gap-2 shadow-md">
               <i data-lucide="play-circle" class="w-4 h-4"></i>
               <span>Watch All 34 Lessons</span>
             </a>
-            <a href="#curriculum" class="px-5 py-3 rounded-xl font-semibold text-xs text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 transition flex items-center gap-2">
-              <span>View Course Curriculum</span>
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-zinc-400"></i>
+            <a href="#curriculum" class="px-5 py-3 rounded-xl font-semibold text-xs text-[#2B2420] hover:text-[#B02468] bg-[#FFF0F7] hover:bg-[#FCE3EE] border border-[#F9D3E5] transition flex items-center gap-2">
+              <span>View Course Syllabus</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-[#B02468]"></i>
             </a>
           </div>
 
           <!-- Rating & Social Proof -->
-          <div class="flex flex-wrap items-center gap-6 pt-3 text-xs text-zinc-400 border-t border-white/[0.08]">
+          <div class="flex flex-wrap items-center gap-6 pt-3 text-xs text-[#6B5E57] border-t border-[#F9D3E5]">
             <div class="flex items-center gap-2">
-              <div class="flex text-amber-400">★★★★★</div>
-              <span class="text-zinc-200 font-bold">4.9 / 5</span>
+              <div class="flex text-amber-500">★★★★★</div>
+              <span class="text-[#2B2420] font-bold">4.9 / 5</span>
               <span>on Google Reviews</span>
             </div>
-            <div class="flex items-center gap-1.5 text-zinc-300 font-medium">
-              <i data-lucide="users" class="w-3.5 h-3.5 text-pink-400"></i>
+            <div class="flex items-center gap-1.5 font-medium text-[#2B2420]">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-[#B02468]"></i>
               <span>2,000+ Students Taught</span>
             </div>
-            <div class="flex items-center gap-1.5 text-zinc-300 font-medium">
-              <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="flex items-center gap-1.5 font-medium text-[#2B2420]">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>6h 30m Total Content</span>
             </div>
           </div>
@@ -168,14 +167,14 @@
 
         <!-- Right Hero Video Player / Facade -->
         <div class="lg:col-span-5" id="video-player">
-          <div class="glass-card rounded-2xl p-2.5 sm:p-3.5 video-glow border border-pink-500/20">
-            <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-zinc-950 border border-white/10" id="mainVideoContainer">
+          <div class="bg-white rounded-3xl p-3 sm:p-4 video-glow border border-[#F9D3E5]">
+            <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-[#F9D3E5]" id="mainVideoContainer">
               <!-- Video Facade / Embed -->
               <iframe 
                 id="mainVideoIframe"
                 class="w-full h-full"
                 src="https://www.youtube.com/embed/z3HlRD_FWoQ?rel=0&modestbranding=1" 
-                title="Crochet English Full Course Intro Video" 
+                title="Crochet English Full Course Intro Video - Olivia Pant" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
                 allowfullscreen>
               </iframe>
@@ -184,13 +183,13 @@
             <!-- Video Player Controls / Active Status -->
             <div class="p-3.5 flex items-center justify-between text-xs">
               <div>
-                <div class="font-bold text-white flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <div class="font-bold text-[#2B2420] flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span id="nowPlayingTitle">Lesson 1: Complete Crochet Introduction</span>
                 </div>
-                <div class="text-[11px] text-zinc-400 mt-0.5">34 Step-by-Step Lessons • Free for all members</div>
+                <div class="text-[11px] text-[#6B5E57] mt-0.5">34 Step-by-Step Lessons • Free for all students</div>
               </div>
-              <div class="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px]">
+              <div class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
                 FREE ACCESS
               </div>
             </div>
@@ -201,54 +200,54 @@
     </section>
 
     <!-- ================= WHO IT'S FOR ================= -->
-    <section id="for-you" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#0c0d10]">
+    <section id="for-you" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-[#FFF0F7]/50">
       <div class="max-w-7xl mx-auto space-y-8">
         
         <div class="space-y-2 max-w-xl">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Targeted Guidance</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">Made for people who have never crocheted before</h2>
-          <p class="text-xs sm:text-sm text-zinc-400">Everything is explained in plain English, with no skipped steps and no technical jargon.</p>
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Targeted Guidance</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">Made for people who have never crocheted before</h2>
+          <p class="text-xs sm:text-sm text-[#6B5E57]">Everything is taught in plain English by Olivia Pant, with zero skipped steps and zero technical confusion.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-pink-100 border border-pink-200 flex items-center justify-center text-[#B02468]">
               <i data-lucide="sparkles" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">Complete Beginners</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
-              You don't need to know a single stitch. We start with how to hold the hook and yarn, and build confidence from there.
+            <h3 class="font-bold text-sm text-[#2B2420]">Complete Beginners</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
+              You don't need to know a single stitch. Olivia starts right with how to hold the hook and yarn comfortably, building confidence row by row.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700">
               <i data-lucide="youtube" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">Tired of YouTube</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
-              Random tutorials skip steps and jump between stitch styles. Here, every lesson logically connects to the previous one in order.
+            <h3 class="font-bold text-sm text-[#2B2420]">Tired of Random Videos</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
+              Random online tutorials skip steps and jump between styles. Here, each of the 34 lessons logically connects to the previous one in order.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-700">
               <i data-lucide="gift" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">Gift Makers</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
-              Make baby booties, designer bags, realistic roses and amigurumi plushies that people cherish far longer than store-bought gifts.
+            <h3 class="font-bold text-sm text-[#2B2420]">Handmade Gift Makers</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
+              Make baby booties, designer bags, realistic 3D roses and plush amigurumi that friends and family cherish far longer than store-bought gifts.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700">
               <i data-lucide="heart" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">Mindful Creators</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
-              Crochet is calm, repetitive, and deeply therapeutic. A few quiet rows after a long workday beats another hour of screen scrolling.
+            <h3 class="font-bold text-sm text-[#2B2420]">Mindful Creators</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
+              Crochet is calm, rhythmic, and deeply therapeutic. A few quiet rows after a busy day beats another hour of exhausting screen scrolling.
             </p>
           </div>
 
@@ -258,13 +257,13 @@
     </section>
 
     <!-- ================= CURRICULUM: 6 PARTS & 20 PROJECTS ================= -->
-    <section id="curriculum" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#090a0c]">
+    <section id="curriculum" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-white">
       <div class="max-w-7xl mx-auto space-y-10">
         
         <div class="space-y-2 max-w-2xl">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Course Syllabus</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">34 Lessons. 6 Parts. 20 Projects you'll actually use.</h2>
-          <p class="text-xs sm:text-sm text-zinc-400">
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Course Syllabus</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">34 Lessons. 6 Parts. 20 Projects you'll actually use.</h2>
+          <p class="text-xs sm:text-sm text-[#6B5E57]">
             6 hours and 30 minutes of step-by-step video instruction. Every lesson is short and focused so you can pause, rewind, and crochet along at your own pace.
           </p>
         </div>
@@ -273,79 +272,79 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects">
           
           <!-- Part 1 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 1 • Fundamentals</div>
-            <h3 class="text-base font-bold text-white">Tools, Hooks & Yarn Selection</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 1 • Fundamentals</div>
+            <h3 class="text-base font-bold text-[#2B2420]">Tools, Hooks & Yarn Selection</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Pick the right crochet hook size and yarn ply so your tension is smooth and your stitches look crisp from day one.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Yarn weights, hook sizing, tension holding</span>
             </div>
           </div>
 
           <!-- Part 2 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 2 • Core Stitches</div>
-            <h3 class="text-base font-bold text-white">The Essential Foundation Stitches</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 2 • Core Stitches</div>
+            <h3 class="text-base font-bold text-[#2B2420]">The Essential Foundation Stitches</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Master the slip knot, foundation chain, single, half-double, double, and triple crochet stitches behind every project.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Chain stitch, SC, HDC, DC & TR crochet</span>
             </div>
           </div>
 
           <!-- Part 3 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 3 • Decorative</div>
-            <h3 class="text-base font-bold text-white">Decorative Motifs & Granny Squares</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 3 • Decorative</div>
+            <h3 class="text-base font-bold text-[#2B2420]">Decorative Motifs & Granny Squares</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Crochet bows made two ways (magic ring and chain method), blooming flowers, 3D roses, and classic granny squares.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Bows, floral roses & joining granny squares</span>
             </div>
           </div>
 
           <!-- Part 4 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 4 • Everyday Items</div>
-            <h3 class="text-base font-bold text-white">Handy Accessories & Gifts</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 4 • Everyday Items</div>
+            <h3 class="text-base font-bold text-[#2B2420]">Handy Accessories & Gifts</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Craft a vibrant sunflower keychain, flower bookmark, cute bear coaster, and drawstring pouches. Quick wins you can gift immediately.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Keychain, coaster, bookmark & pouch</span>
             </div>
           </div>
 
           <!-- Part 5 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 5 • Wearables</div>
-            <h3 class="text-base font-bold text-white">Fashion, Bags & Baby Clothes</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 5 • Wearables</div>
+            <h3 class="text-base font-bold text-[#2B2420]">Fashion, Bags & Baby Clothes</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Create a stylish beanie cap, soft baby shoes, hair bands, a complete baby frock dress, and a trendy designer sling bag.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>Baby frock, sling bag, booties & beanie</span>
             </div>
           </div>
 
           <!-- Part 6 -->
-          <div class="glass-card p-6 rounded-2xl space-y-3 border-l-4 border-l-pink-500">
-            <div class="text-[11px] font-bold uppercase tracking-wider text-pink-400">Part 6 • Advanced</div>
-            <h3 class="text-base font-bold text-white">Amigurumi Plushies & 3D Shapes</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] p-6 rounded-2xl space-y-3 border border-[#F9D3E5] border-l-4 border-l-[#B02468] shadow-xs hover:shadow-md transition">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#B02468]">Part 6 • Advanced</div>
+            <h3 class="text-base font-bold text-[#2B2420]">Amigurumi Plushies & 3D Shapes</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Level up into 3D sculpting with a stuffed crochet heart and a full amigurumi bunny toy with ears, paws, and stuffing techniques.
             </p>
-            <div class="pt-2 text-xs text-zinc-300 font-medium flex items-center gap-1.5">
-              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <div class="pt-2 text-xs text-[#2B2420] font-medium flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
               <span>3D heart & complete amigurumi bunny</span>
             </div>
           </div>
@@ -353,13 +352,13 @@
         </div>
 
         <!-- Full 34 Lessons Interactive List -->
-        <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+        <div class="bg-[#FFF8FA] rounded-3xl p-6 sm:p-8 space-y-6 border border-[#F9D3E5] shadow-xs">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#F9D3E5] pb-4">
             <div>
-              <h3 class="text-lg font-bold text-white">Complete Lesson Catalog (34 Lessons)</h3>
-              <p class="text-xs text-zinc-400">Click any lesson to jump directly into the video player</p>
+              <h3 class="text-lg font-bold text-[#2B2420]">Complete Lesson Catalog (34 Lessons)</h3>
+              <p class="text-xs text-[#6B5E57]">Click any lesson below to jump into the player and start crocheting</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               34 Lessons · 100% Free
             </span>
           </div>
@@ -373,43 +372,43 @@
     </section>
 
     <!-- ================= STARTER KIT ================= -->
-    <section id="starter-kit" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#0c0d10]">
+    <section id="starter-kit" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-[#FFF0F7]/50">
       <div class="max-w-7xl mx-auto space-y-8">
         
         <div class="space-y-2 max-w-xl">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Before You Begin</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">All you need is three simple tools</h2>
-          <p class="text-xs sm:text-sm text-zinc-400">No expensive machinery or special kit. You can find these at any local craft store or online for a few dollars.</p>
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Before You Begin</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">All you need is three simple tools</h2>
+          <p class="text-xs sm:text-sm text-[#6B5E57]">No expensive machinery or special kit. You can find these at any local craft store or online for a few dollars.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/25 flex items-center justify-center text-pink-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-pink-100 border border-pink-200 flex items-center justify-center text-[#B02468]">
               <i data-lucide="pen-tool" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">1. A 4 mm or 5 mm Hook</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+            <h3 class="font-bold text-sm text-[#2B2420]">1. A 4 mm or 5 mm Hook</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Standard aluminum or ergonomic crochet hook. Sizes 4 mm (G/6) and 5 mm (H/8) are the most forgiving for learning proper yarn tension.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700">
               <i data-lucide="disc" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">2. Medium-Weight Yarn</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
-              Worsted (Category 4) or 8-ply yarn. Pick a light pastel color (cream, mint, or pink) so you can easily see every individual stitch loop.
+            <h3 class="font-bold text-sm text-[#2B2420]">2. Medium-Weight Yarn</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
+              Worsted (Category 4) or 8-ply yarn. Pick a light pastel color (cream, mint, or soft pink) so you can easily see every individual stitch loop.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+          <div class="light-card p-6 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700">
               <i data-lucide="scissors" class="w-5 h-5"></i>
             </div>
-            <h3 class="font-bold text-sm text-white">3. Scissors & Tapestry Needle</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+            <h3 class="font-bold text-sm text-[#2B2420]">3. Scissors & Tapestry Needle</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Any basic scissors to snip yarn ends, and a blunt large-eye tapestry needle to cleanly weave in your tails for a polished, seamless finish.
             </p>
           </div>
@@ -420,36 +419,36 @@
     </section>
 
     <!-- ================= TEACHER INSTRUCTOR ================= -->
-    <section class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#090a0c]">
+    <section id="tutor" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-white">
       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
         <div class="lg:col-span-4 flex justify-center">
-          <div class="relative w-48 h-48 sm:w-56 sm:h-56 rounded-3xl overflow-hidden bg-gradient-to-tr from-pink-600 to-rose-400 p-1">
-            <div class="w-full h-full rounded-[22px] bg-zinc-900 flex flex-col items-center justify-center text-center p-4">
-              <div class="w-20 h-20 rounded-full bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400 mb-3">
+          <div class="relative w-52 h-52 sm:w-60 sm:h-60 rounded-3xl overflow-hidden bg-gradient-to-tr from-[#B02468] via-pink-400 to-rose-300 p-1 shadow-lg">
+            <div class="w-full h-full rounded-[22px] bg-gradient-to-b from-[#FFF0F7] to-white flex flex-col items-center justify-center text-center p-4">
+              <div class="w-20 h-20 rounded-full bg-pink-100 border border-pink-200 flex items-center justify-center text-[#B02468] mb-3 shadow-inner">
                 <i data-lucide="user" class="w-10 h-10"></i>
               </div>
-              <div class="font-bold text-white text-base">Munseena Muhammed</div>
-              <div class="text-[11px] text-pink-400 font-semibold mt-0.5">Master Crochet Artisan</div>
+              <div class="font-bold text-[#2B2420] text-lg">Olivia Pant</div>
+              <div class="text-[11px] text-[#B02468] font-bold mt-0.5">Master Crochet Artisan</div>
             </div>
           </div>
         </div>
 
         <div class="lg:col-span-8 space-y-4">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Your Instructor</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">Taught by Munseena Muhammed</h2>
-          <p class="text-sm text-zinc-300 leading-relaxed">
-            Munseena has been passionately crocheting for over 10 years and has handcrafted and delivered more than 10,000 unique pieces to collectors, boutiques, and customers across multiple countries.
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Your Master Instructor</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">Taught by Olivia Pant</h2>
+          <p class="text-sm text-[#3B2A2E] leading-relaxed">
+            Olivia Pant has been passionately crocheting for over 10 years and has handcrafted and delivered more than 10,000 unique pieces to collectors, boutiques, and customers across multiple countries.
           </p>
-          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-            In this masterclass, she shares her battle-tested tips, tension shortcuts, and step-by-step methods so that even first-time crafters can produce professional, boutique-quality pieces right away.
+          <p class="text-xs sm:text-sm text-[#6B5E57] leading-relaxed">
+            In this masterclass, Olivia shares her battle-tested tips, tension shortcuts, and step-by-step methods so that even first-time crafters can produce professional, boutique-quality pieces right away.
           </p>
-          <div class="flex items-center gap-6 pt-2 text-xs font-semibold text-zinc-300">
-            <div><span class="text-white font-bold text-base">10+</span> Years Experience</div>
-            <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
-            <div><span class="text-white font-bold text-base">10,000+</span> Pieces Created</div>
-            <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
-            <div><span class="text-emerald-400 font-bold text-base">2,000+</span> Students</div>
+          <div class="flex items-center gap-6 pt-2 text-xs font-semibold text-[#5A4D46]">
+            <div><span class="text-[#2B2420] font-bold text-base">10+</span> Years Experience</div>
+            <div class="w-1 h-1 rounded-full bg-zinc-300"></div>
+            <div><span class="text-[#2B2420] font-bold text-base">10,000+</span> Pieces Created</div>
+            <div class="w-1 h-1 rounded-full bg-zinc-300"></div>
+            <div><span class="text-emerald-700 font-bold text-base">2,000+</span> Students</div>
           </div>
         </div>
 
@@ -457,19 +456,19 @@
     </section>
 
     <!-- ================= REVIEWS & TESTIMONIALS ================= -->
-    <section id="reviews" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#0c0d10]">
+    <section id="reviews" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-[#FFF0F7]/50">
       <div class="max-w-7xl mx-auto space-y-10">
         
         <div class="flex flex-wrap items-end justify-between gap-6">
           <div class="space-y-2 max-w-xl">
-            <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Student Reviews</div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-white">Rated 4.9★ on Google by 2,000+ Crafters</h2>
+            <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Student Reviews</div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">Rated 4.9★ on Google by 2,000+ Crafters</h2>
           </div>
-          <div class="glass-card px-5 py-3 rounded-2xl flex items-center gap-3">
-            <div class="text-2xl font-bold text-white">4.9</div>
+          <div class="bg-white border border-[#F9D3E5] px-5 py-3 rounded-2xl flex items-center gap-3 shadow-xs">
+            <div class="text-2xl font-bold text-[#2B2420]">4.9</div>
             <div>
-              <div class="text-amber-400 text-xs">★★★★★</div>
-              <div class="text-[10px] text-zinc-400">from 2,000+ reviews</div>
+              <div class="text-amber-500 text-xs">★★★★★</div>
+              <div class="text-[10px] text-[#6B5E57]">from 2,000+ reviews</div>
             </div>
           </div>
         </div>
@@ -477,69 +476,69 @@
         <!-- Reviews Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
-              "Within just 2 days, I was able to learn and understand everything very clearly. The classes are explained so well that I could understand each and every step properly. I really enjoyed learning this course! 🧶❤️"
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
+              "Within just 2 days, I was able to learn and understand everything very clearly. Olivia explains every detail so that each step is easy to remember. I really enjoyed learning this course! 🧶❤️"
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-pink-500/20 text-pink-400 font-bold text-xs flex items-center justify-center">S</div>
-              <span class="text-xs font-semibold text-white">Saiba Shanavas</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-pink-100 text-[#B02468] font-bold text-xs flex items-center justify-center">S</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Saiba Shanavas</span>
             </div>
           </div>
 
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
               "I didn't know anything about crochet when I started. After learning, I made a little toy for my child, and he was so happy when he saw it. Then his friends started asking for one too! Now I make pieces for everyone."
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 font-bold text-xs flex items-center justify-center">S</div>
-              <span class="text-xs font-semibold text-white">Salbana • Kasaragod</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-amber-100 text-amber-700 font-bold text-xs flex items-center justify-center">S</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Salbana • Kasaragod</span>
             </div>
           </div>
 
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
               "I joined so I could do something creative with my free time after housework. Now people say lovely things whenever they see my work. Because there is lifetime access, I can go back and rewatch whenever I need."
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center">R</div>
-              <span class="text-xs font-semibold text-white">Rafana • Kottayam</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">R</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Rafana • Kottayam</span>
             </div>
           </div>
 
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
               "I wanted to earn some pocket money of my own alongside my studies. Now I'm making and selling keychains and tote bags. The joy of someone loving and buying something you made yourself is unbeatable."
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs flex items-center justify-center">N</div>
-              <span class="text-xs font-semibold text-white">Niva • Kochi</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">N</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Niva • Kochi</span>
             </div>
           </div>
 
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
               "This was the first time I ever took an online craft class. Everything is broken down so simply that it was easy to follow along. Now I make lots of crochet pieces on my own, including amigurumi dolls. My family was shocked!"
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-rose-500/20 text-rose-400 font-bold text-xs flex items-center justify-center">S</div>
-              <span class="text-xs font-semibold text-white">Shreya • Kochi</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center">S</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Shreya • Kochi</span>
             </div>
           </div>
 
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="text-amber-400 text-xs">★★★★★</div>
-            <p class="text-xs text-zinc-300 italic leading-relaxed">
-              "I always loved looking at crochet pieces on Pinterest, but doubted I could ever do it myself. The way the teacher explains each step helped me pick things up immediately. All that self-doubt disappeared completely!"
+          <div class="light-card p-5 rounded-2xl space-y-3 hover:shadow-md transition">
+            <div class="text-amber-500 text-xs">★★★★★</div>
+            <p class="text-xs text-[#3B2A2E] italic leading-relaxed">
+              "I always loved looking at crochet pieces on Pinterest, but doubted I could ever do it myself. The way Olivia explains each step helped me pick things up immediately. All that self-doubt disappeared completely!"
             </p>
-            <div class="flex items-center gap-2.5 pt-1 border-t border-white/[0.06]">
-              <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs flex items-center justify-center">A</div>
-              <span class="text-xs font-semibold text-white">Amal • Qatar</span>
+            <div class="flex items-center gap-2.5 pt-1 border-t border-[#F9D3E5]">
+              <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">A</div>
+              <span class="text-xs font-semibold text-[#2B2420]">Amal • Qatar</span>
             </div>
           </div>
 
@@ -549,37 +548,37 @@
     </section>
 
     <!-- ================= LEARN · MAKE · SELL ================= -->
-    <section class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#090a0c]">
+    <section class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-white">
       <div class="max-w-7xl mx-auto space-y-8 text-center">
         
         <div class="space-y-2 max-w-xl mx-auto">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Learn · Make · Sell</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">Turn your new crochet skill into income</h2>
-          <p class="text-xs sm:text-sm text-zinc-400">Once your pieces are finished, you can sell them online, at local pop-ups, or to friends & family.</p>
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Learn · Make · Sell</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">Turn your new crochet skill into income</h2>
+          <p class="text-xs sm:text-sm text-[#6B5E57]">Once your pieces are finished, you can sell them online, at local pop-ups, or to friends & family.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
           
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">1</div>
-            <h3 class="font-bold text-sm text-white">Learn & Make</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] border border-[#F9D3E5] p-6 rounded-2xl space-y-3 shadow-xs">
+            <div class="w-8 h-8 rounded-full bg-[#B02468] text-white font-bold text-xs flex items-center justify-center">1</div>
+            <h3 class="font-bold text-sm text-[#2B2420]">Learn & Make</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Build true muscle memory by completing the 20 structured video projects in this course.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">2</div>
-            <h3 class="font-bold text-sm text-white">Photograph & Share</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] border border-[#F9D3E5] p-6 rounded-2xl space-y-3 shadow-xs">
+            <div class="w-8 h-8 rounded-full bg-[#B02468] text-white font-bold text-xs flex items-center justify-center">2</div>
+            <h3 class="font-bold text-sm text-[#2B2420]">Photograph & Share</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               Snap crisp photos of your finished bags, keychains, and baby shoes in natural light.
             </p>
           </div>
 
-          <div class="glass-card p-6 rounded-2xl space-y-3">
-            <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-bold text-xs flex items-center justify-center">3</div>
-            <h3 class="font-bold text-sm text-white">Sell With Confidence</h3>
-            <p class="text-xs text-zinc-400 leading-relaxed">
+          <div class="bg-[#FFF8FA] border border-[#F9D3E5] p-6 rounded-2xl space-y-3 shadow-xs">
+            <div class="w-8 h-8 rounded-full bg-[#B02468] text-white font-bold text-xs flex items-center justify-center">3</div>
+            <h3 class="font-bold text-sm text-[#2B2420]">Sell With Confidence</h3>
+            <p class="text-xs text-[#6B5E57] leading-relaxed">
               List on Etsy, Instagram, or local markets. High-demand handmade crafts fetch $20 - $80+ per piece.
             </p>
           </div>
@@ -590,63 +589,63 @@
     </section>
 
     <!-- ================= PRICING: 100% FREE ================= -->
-    <section id="pricing" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#0c0d10]">
+    <section id="pricing" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-[#FFF0F7]/50">
       <div class="max-w-xl mx-auto space-y-8">
         
         <div class="text-center space-y-2">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Instant Access</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">One Masterclass. 100% Free.</h2>
-          <p class="text-xs sm:text-sm text-zinc-400">No subscriptions, no hidden paywalls, and no credit card required.</p>
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Instant Access</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">One Masterclass. 100% Free.</h2>
+          <p class="text-xs sm:text-sm text-[#6B5E57]">No subscriptions, no hidden paywalls, and no credit card required.</p>
         </div>
 
-        <div class="glass-card p-6 sm:p-8 rounded-3xl border border-pink-500/30 space-y-6 relative overflow-hidden">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-[#F9D3E5] shadow-xl space-y-6 relative overflow-hidden">
           
-          <div class="absolute -top-10 -right-10 w-36 h-36 bg-pink-500/10 rounded-full blur-2xl"></div>
+          <div class="absolute -top-10 -right-10 w-36 h-36 bg-pink-100 rounded-full blur-2xl"></div>
 
           <div class="space-y-2">
-            <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">Crochet Full Masterclass • English Edition</div>
+            <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">Crochet Full Masterclass • English Edition with Olivia Pant</div>
             <div class="flex items-baseline gap-3">
-              <span class="text-4xl font-extrabold text-emerald-400">FREE</span>
-              <span class="text-base text-zinc-500 line-through">₹1,999 ($49)</span>
-              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">100% OFF</span>
+              <span class="text-4xl font-extrabold text-emerald-600">FREE</span>
+              <span class="text-base text-zinc-400 line-through">₹1,999 ($49)</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">100% OFF</span>
             </div>
-            <p class="text-xs text-zinc-400">Available to watch anytime, anywhere on phone, tablet, or laptop.</p>
+            <p class="text-xs text-[#6B5E57]">Available to watch anytime, anywhere on phone, tablet, or laptop.</p>
           </div>
 
-          <div class="space-y-2.5 text-xs text-zinc-300 border-t border-b border-white/[0.08] py-5">
+          <div class="space-y-2.5 text-xs text-[#3B2A2E] border-t border-b border-[#F9D3E5] py-5">
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
               <span>34 step-by-step video lessons (6 hours 30 minutes total)</span>
             </div>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
               <span>20 real projects, from first slip knot to amigurumi bunny</span>
             </div>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-              <span>Taught in clear, accessible, step-by-step English</span>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+              <span>Taught in clear, accessible, step-by-step English by Olivia Pant</span>
             </div>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
               <span>Zero experience required to start</span>
             </div>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
               <span>Permanent lifetime access with no deadlines or expiry</span>
             </div>
             <div class="flex items-center gap-2.5">
-              <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
               <span>Direct pairing with our 1,000+ Crochet Pattern Treasury</span>
             </div>
           </div>
 
           <div class="space-y-3">
-            <a href="#video-player" class="w-full py-3.5 px-4 rounded-xl font-bold text-xs text-zinc-950 bg-white hover:bg-zinc-200 shadow-xl transition flex items-center justify-center gap-2">
-              <i data-lucide="play-circle" class="w-4 h-4 text-zinc-950"></i>
+            <a href="#video-player" class="w-full py-3.5 px-4 rounded-xl font-bold text-xs text-white bg-[#B02468] hover:bg-[#8E1C53] shadow-md transition flex items-center justify-center gap-2">
+              <i data-lucide="play-circle" class="w-4 h-4 text-white"></i>
               <span>Start Watching Lessons Right Now — Free</span>
             </a>
-            <a href="/" class="w-full py-3 px-4 rounded-xl font-semibold text-xs text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 transition flex items-center justify-center gap-2">
-              <i data-lucide="book-open" class="w-3.5 h-3.5 text-zinc-400"></i>
+            <a href="/" class="w-full py-3 px-4 rounded-xl font-semibold text-xs text-[#2B2420] hover:text-[#B02468] bg-[#FFF0F7] hover:bg-[#FCE3EE] border border-[#F9D3E5] transition flex items-center justify-center gap-2">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-[#B02468]"></i>
               <span>Browse 1,000+ Pattern Library</span>
             </a>
           </div>
@@ -657,62 +656,62 @@
     </section>
 
     <!-- ================= FAQ ================= -->
-    <section id="faq" class="py-16 px-4 sm:px-8 border-b border-white/[0.08] bg-[#090a0c]">
+    <section id="faq" class="py-16 px-4 sm:px-8 border-b border-[#F9D3E5] bg-white">
       <div class="max-w-3xl mx-auto space-y-8">
         
         <div class="text-center space-y-2">
-          <div class="text-xs font-bold text-pink-400 uppercase tracking-wider">FAQ</div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white">Questions & Answers</h2>
+          <div class="text-xs font-bold text-[#B02468] uppercase tracking-wider">FAQ</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#2B2420]">Questions & Answers</h2>
         </div>
 
         <div class="space-y-3 text-xs sm:text-sm">
           
-          <details class="glass-card rounded-xl p-4 cursor-pointer group">
-            <summary class="font-bold text-white flex items-center justify-between">
+          <details class="bg-[#FFF8FA] border border-[#F9D3E5] rounded-xl p-4 cursor-pointer group hover:border-[#B02468]/40 transition">
+            <summary class="font-bold text-[#2B2420] flex items-center justify-between">
               <span>Can I learn this with zero prior crochet experience?</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition"></i>
             </summary>
-            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+            <p class="mt-3 text-xs text-[#5A4D46] leading-relaxed">
               Yes, absolutely! The masterclass is designed specifically for complete beginners. Lesson 1 walks you through how to hold your hook, hold the yarn, and form your very first slip knot.
             </p>
           </details>
 
-          <details class="glass-card rounded-xl p-4 cursor-pointer group">
-            <summary class="font-bold text-white flex items-center justify-between">
+          <details class="bg-[#FFF8FA] border border-[#F9D3E5] rounded-xl p-4 cursor-pointer group hover:border-[#B02468]/40 transition">
+            <summary class="font-bold text-[#2B2420] flex items-center justify-between">
               <span>What supplies do I need to buy?</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition"></i>
             </summary>
-            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+            <p class="mt-3 text-xs text-[#5A4D46] leading-relaxed">
               Just three basics: a 4 mm or 5 mm crochet hook, a skein of medium-weight (worsted or 8-ply) light-colored yarn, scissors, and a tapestry needle to weave in ends.
             </p>
           </details>
 
-          <details class="glass-card rounded-xl p-4 cursor-pointer group">
-            <summary class="font-bold text-white flex items-center justify-between">
+          <details class="bg-[#FFF8FA] border border-[#F9D3E5] rounded-xl p-4 cursor-pointer group hover:border-[#B02468]/40 transition">
+            <summary class="font-bold text-[#2B2420] flex items-center justify-between">
               <span>Is this video course really 100% Free?</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition"></i>
             </summary>
-            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
-              Yes! All 34 lessons are provided completely free for our community. You can watch anytime at zero cost. If you also want our curated library of 1,000+ downloadable pattern PDFs, that is also available on our main site.
+            <p class="mt-3 text-xs text-[#5A4D46] leading-relaxed">
+              Yes! All 34 lessons taught by Olivia Pant are provided completely free for our community. You can watch anytime at zero cost. If you also want our curated library of 1,000+ downloadable pattern PDFs, that is also available on our main site.
             </p>
           </details>
 
-          <details class="glass-card rounded-xl p-4 cursor-pointer group">
-            <summary class="font-bold text-white flex items-center justify-between">
+          <details class="bg-[#FFF8FA] border border-[#F9D3E5] rounded-xl p-4 cursor-pointer group hover:border-[#B02468]/40 transition">
+            <summary class="font-bold text-[#2B2420] flex items-center justify-between">
               <span>How long is the course and is there a time limit?</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition"></i>
             </summary>
-            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+            <p class="mt-3 text-xs text-[#5A4D46] leading-relaxed">
               The series comprises 34 bite-sized lessons totaling 6 hours and 30 minutes. You have lifetime access with zero deadlines — pause, rewind, and practice whenever fits your schedule.
             </p>
           </details>
 
-          <details class="glass-card rounded-xl p-4 cursor-pointer group">
-            <summary class="font-bold text-white flex items-center justify-between">
+          <details class="bg-[#FFF8FA] border border-[#F9D3E5] rounded-xl p-4 cursor-pointer group hover:border-[#B02468]/40 transition">
+            <summary class="font-bold text-[#2B2420] flex items-center justify-between">
               <span>What specific projects will I be able to make?</span>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition"></i>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-500 group-open:rotate-180 transition"></i>
             </summary>
-            <p class="mt-3 text-xs text-zinc-400 leading-relaxed">
+            <p class="mt-3 text-xs text-[#5A4D46] leading-relaxed">
               You will make 20 complete projects: bows (2 methods), flowers, 3D roses, granny squares, sunflower keychains, bookmarks, bear coasters, beanie caps, baby shoes, hair bands, baby frocks, sling bags, and an amigurumi bunny toy!
             </p>
           </details>
@@ -725,14 +724,14 @@
   </main>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="bg-[#07080a] border-t border-white/[0.08] text-xs text-zinc-500 py-10 px-4 sm:px-8">
+  <footer class="bg-[#2B2420] text-[#E0D8D4] text-xs py-10 px-4 sm:px-8 border-t border-[#443834]">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <i data-lucide="sparkles" class="w-4 h-4 text-pink-500"></i>
-        <span class="text-zinc-300 font-bold">Pattern Archive & Video Masterclass</span>
-        <span>• 100% Free Course</span>
+        <i data-lucide="sparkles" class="w-4 h-4 text-pink-400"></i>
+        <span class="text-white font-bold">Pattern Archive & Video Masterclass</span>
+        <span class="text-zinc-400">• Taught by Olivia Pant • 100% Free</span>
       </div>
-      <div class="flex items-center gap-6 text-zinc-400">
+      <div class="flex items-center gap-6 text-zinc-300">
         <a href="/" class="hover:text-white transition">Pattern Library</a>
         <a href="#curriculum" class="hover:text-white transition">34 Lessons</a>
         <a href="#starter-kit" class="hover:text-white transition">Starter Kit</a>
@@ -742,14 +741,14 @@
   </footer>
 
   <!-- ================= MOBILE STICKY CTA ================= -->
-  <div class="fixed bottom-0 left-0 right-0 z-40 bg-[#121316]/95 backdrop-blur-md border-t border-white/10 p-3 sm:hidden flex items-center justify-between gap-3 shadow-2xl">
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F9D3E5] p-3 sm:hidden flex items-center justify-between gap-3 shadow-2xl">
     <div>
-      <div class="font-bold text-white text-xs">Crochet Masterclass</div>
-      <div class="text-[11px] text-emerald-400 font-bold">100% Free Access</div>
+      <div class="font-bold text-[#2B2420] text-xs">Olivia Pant Masterclass</div>
+      <div class="text-[11px] text-emerald-600 font-bold">100% Free Access</div>
     </div>
-    <a href="#video-player" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs flex items-center gap-1.5 transition">
+    <a href="#video-player" class="px-4 py-2 rounded-xl bg-[#B02468] hover:bg-[#8E1C53] text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
       <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
-      <span>Watch Lessons</span>
+      <span>Watch Free</span>
     </a>
   </div>
 
@@ -797,17 +796,17 @@
       if (!container) return;
 
       container.innerHTML = LESSONS.map(l => `
-        <div onclick="selectLesson(${l.id})" class="p-3 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 border border-white/[0.06] hover:border-pink-500/30 cursor-pointer transition flex items-center justify-between group">
+        <div onclick="selectLesson(${l.id})" class="p-3 rounded-xl bg-white hover:bg-[#FFF0F7] border border-[#F9D3E5] hover:border-[#B02468]/50 cursor-pointer transition flex items-center justify-between group shadow-xs">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="w-6 h-6 rounded-lg bg-pink-500/10 text-pink-400 font-bold text-[10px] flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition">
+            <span class="w-6 h-6 rounded-lg bg-pink-50 text-[#B02468] font-bold text-[10px] flex items-center justify-center shrink-0 group-hover:bg-[#B02468] group-hover:text-white transition">
               ${l.id}
             </span>
             <div class="truncate">
-              <div class="text-zinc-200 font-medium truncate group-hover:text-white">${l.title}</div>
-              <div class="text-[10px] text-zinc-500">${l.part} • ${l.duration}</div>
+              <div class="text-[#2B2420] font-medium truncate group-hover:text-[#B02468]">${l.title}</div>
+              <div class="text-[10px] text-[#6B5E57]">${l.part} • ${l.duration}</div>
             </div>
           </div>
-          <i data-lucide="play" class="w-3.5 h-3.5 text-zinc-500 group-hover:text-pink-400 shrink-0 ml-2"></i>
+          <i data-lucide="play" class="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#B02468] shrink-0 ml-2"></i>
         </div>
       `).join('');
 
