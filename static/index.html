@@ -28,6 +28,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Stripe.js v3 -->
+  <script src="https://js.stripe.com/v3/"></script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="bg-[#090a0c] text-zinc-100 min-h-screen flex flex-col font-sans antialiased selection:bg-zinc-700 selection:text-white">
@@ -249,79 +251,151 @@
 
   </main>
 
-  <!-- MODAL: PAYWALL & SUBSCRIPTION CHECKOUT -->
-  <div id="paywallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-    <div class="bg-[#121316] max-w-md w-full rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-7 relative overflow-hidden">
+  <!-- MODAL: ON-PAGE CARD & PAYPAL CHECKOUT -->
+  <div id="paywallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div class="relative w-full max-w-[480px] bg-white text-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
       
       <!-- Close Button -->
-      <button id="closePaywallModalBtn" class="absolute top-4 right-4 p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition">
+      <button id="closePaywallModalBtn" class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition backdrop-blur-sm cursor-pointer">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <!-- Header Icon -->
-      <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center mb-4 text-zinc-200">
-        <i data-lucide="lock" class="w-5 h-5"></i>
+      <!-- Top Black Hero Header -->
+      <div class="bg-black text-white p-6 sm:p-7 relative">
+        <div class="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-zinc-400 mb-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>COMPLETE CROCHET LIBRARY</span>
+        </div>
+        <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2.5">
+          1,000+ Crochet Patterns
+        </h3>
+        <div class="flex items-baseline gap-2.5">
+          <span class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">$39</span>
+          <span class="text-sm text-zinc-400 line-through font-normal">$129</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-800 text-zinc-100 border border-zinc-700 tracking-wide">70% OFF</span>
+        </div>
       </div>
 
-      <h3 class="text-lg font-semibold text-white mb-1">Lifetime All-Access Pass</h3>
-      <p class="text-xs text-zinc-400 mb-5">
-        One-time payment of $39 for permanent access to the complete 1,000+ Crochet Pattern Treasury & all future updates.
-      </p>
-
-      <!-- Pricing Card -->
-      <div class="mb-5 p-4 rounded-xl border border-white/20 bg-zinc-900/70 relative">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-white">Lifetime Archive Pass</span>
-            <span class="px-2 py-0.5 rounded text-[9px] bg-white text-zinc-950 font-bold tracking-wider">ONE-TIME</span>
+      <!-- White Form Body -->
+      <div class="p-5 sm:p-6 space-y-3.5 bg-white text-zinc-900">
+        
+        <!-- Checklist (2 Columns) -->
+        <div class="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] text-zinc-700 font-medium">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>948+ Curated Patterns</span>
           </div>
-          <div class="text-right">
-            <span class="text-xl font-bold text-white">$39</span>
-            <span class="text-[10px] text-zinc-400">USD</span>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>Instant PDF Downloads</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>High-Res Vector Charts</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>Beginner to Master Guides</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>Lifetime Access & Updates</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-zinc-900 shrink-0"></i>
+            <span>24/7 Access on Any Device</span>
           </div>
         </div>
-        <div class="text-[11px] text-zinc-400">Pay once, own forever. Zero recurring subscriptions or hidden fees.</div>
-      </div>
 
-      <!-- Features Checklist -->
-      <div class="space-y-2.5 text-xs text-zinc-300 mb-6 bg-zinc-900/40 p-3.5 rounded-xl border border-white/[0.06]">
-        <div class="flex items-center gap-2.5">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-          <span>Instant unblur on all 948+ crochet pattern PDFs</span>
+        <!-- Green Highlight Banner -->
+        <div class="bg-emerald-50 border border-emerald-200/90 text-emerald-800 rounded-xl py-2 px-3 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+          <span>Instant Download — All 1,000+ Patterns Included</span>
         </div>
-        <div class="flex items-center gap-2.5">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-          <span>Direct high-speed downloads via Cloudflare R2 CDN</span>
-        </div>
-        <div class="flex items-center gap-2.5">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-          <span>High-resolution vector stitch charts & printable sheets</span>
-        </div>
-        <div class="flex items-center gap-2.5">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-          <span>Lifetime access to all future pattern releases</span>
-        </div>
-      </div>
 
-      <!-- Action Button -->
-      <div class="space-y-3">
-        <button id="confirmUnlockBtn" class="w-full py-3.5 px-4 rounded-xl font-semibold text-xs text-zinc-950 bg-white hover:bg-zinc-200 shadow-lg transition flex items-center justify-center gap-2">
+        <!-- Urgency Countdown Timer Box -->
+        <div class="rounded-xl border border-zinc-200 bg-zinc-50/80 px-3.5 py-2.5 flex items-center justify-between text-xs text-zinc-700">
+          <div class="flex items-center gap-2 font-medium">
+            <i data-lucide="clock" class="w-4 h-4 text-zinc-500"></i>
+            <span>Offer ends in:</span>
+          </div>
+          <div id="checkoutCountdown" class="font-mono font-bold text-zinc-950 bg-white border border-zinc-200 px-2.5 py-0.5 rounded-md shadow-xs tracking-wider text-xs">01:37:30</div>
+        </div>
+
+        <!-- Email Field -->
+        <div>
+          <label class="block text-xs font-bold text-zinc-800 mb-1">Email</label>
+          <div class="relative flex items-center">
+            <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 text-zinc-400"></i>
+            <input type="email" id="checkoutEmail" required placeholder="your@email.com" class="w-full pl-10 pr-3.5 py-2.5 text-xs text-zinc-900 bg-white border border-zinc-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:border-zinc-950 transition font-normal" />
+          </div>
+        </div>
+
+        <!-- Card Payment Elements -->
+        <div class="space-y-2">
+          <div>
+            <label class="block text-xs font-bold text-zinc-800 mb-1">Card number</label>
+            <div class="relative flex items-center bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-zinc-950 focus-within:border-zinc-950 transition">
+              <i data-lucide="credit-card" class="w-4 h-4 text-zinc-400 mr-2 shrink-0"></i>
+              <div id="stripe-card-number" class="w-full text-xs"></div>
+              <div id="cardBrandPill" class="ml-2 flex items-center gap-1 shrink-0">
+                <span class="px-1.5 py-0.5 rounded bg-zinc-100 text-[10px] font-bold text-zinc-600 border border-zinc-200">CARD</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-zinc-800 mb-1">Expiry</label>
+              <div class="bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-zinc-950 focus-within:border-zinc-950 transition">
+                <div id="stripe-card-expiry" class="w-full text-xs"></div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-zinc-800 mb-1">CVV</label>
+              <div class="bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-zinc-950 focus-within:border-zinc-950 transition">
+                <div id="stripe-card-cvc" class="w-full text-xs"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Error Message -->
+        <div id="checkoutCardError" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-xl p-2.5"></div>
+
+        <!-- CTA Button -->
+        <button id="payCardSubmitBtn" type="button" class="w-full py-3.5 px-4 rounded-xl font-bold text-xs text-white bg-zinc-950 hover:bg-black shadow-lg transition duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
           <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span>Pay $39 with Stripe — Lifetime All-Access</span>
+          <span id="payCardSubmitText">Get Instant Access ($39)</span>
         </button>
 
-        <div class="flex items-center gap-2">
-          <input type="text" id="promoCodeInput" placeholder="Promo code or email" class="flex-1 bg-[#090a0c] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-400" />
-          <button id="applyPromoBtn" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-xs font-medium rounded-lg text-zinc-300 border border-white/10 transition">
-            Apply
-          </button>
+        <!-- Divider -->
+        <div class="relative flex items-center justify-center my-2">
+          <div class="border-t border-zinc-200 w-full"></div>
+          <span class="bg-white px-3 text-[11px] text-zinc-400 font-medium whitespace-nowrap">or pay with</span>
+          <div class="border-t border-zinc-200 w-full"></div>
         </div>
-      </div>
 
-      <p class="text-center text-[10px] text-zinc-500 mt-4 flex items-center justify-center gap-1.5">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-zinc-400"></i>
-        <span>256-bit Encrypted Checkout via Stripe • Cards, Apple Pay, Google Pay</span>
-      </p>
+        <!-- PayPal Button -->
+        <div>
+          <button id="paypalCheckoutBtn" type="button" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-[#0070BA] hover:bg-[#005ea6] shadow transition flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="h-4 fill-white inline-block" viewBox="0 0 100 26" xmlns="http://www.w3.org/2000/svg"><path d="M12.24 3.12h-8.1a.95.95 0 0 0-.94.81L.03 23.32a.63.63 0 0 0 .62.72h4.5a.95.95 0 0 0 .94-.81l.9-5.71a.95.95 0 0 1 .94-.81h2.7c5.23 0 8.35-2.53 9.14-7.5.35-2.22.02-3.95-.98-5.14-1.12-1.34-3.09-1.88-5.55-1.88zm.92 6.07c-.45 2.87-2.67 2.87-4.74 2.87h-1.3l.97-6.17c.04-.26.26-.45.52-.45h.8c1.37 0 2.65 0 3.29.74.39.46.54 1.18.46 2.01zM34.92 8.76h-4.48a.95.95 0 0 0-.94.81l-.19 1.18-.3-.44c-.95-1.39-3.08-1.86-5.28-1.86-4.94 0-9.15 3.74-9.98 9.04-.44 2.76.24 5.34 1.88 7.08 1.51 1.6 3.65 2.16 5.89 2.16 4.14 0 6.47-2.65 6.47-2.65l-.2 1.25a.63.63 0 0 0 .62.72h4.05a.95.95 0 0 0 .94-.81l2.4-15.28a.63.63 0 0 0-.62-.72zm-4.7 7.74c-.42 2.67-2.5 4.49-5.18 4.49-1.35 0-2.45-.44-3.02-1.22-.57-.77-.73-1.85-.46-3.03.42-2.64 2.52-4.48 5.17-4.48 1.34 0 2.43.45 3 1.22.58.77.74 1.85.49 3.02zM53.15 8.76h-4.43a.95.95 0 0 0-.9.64l-6.32 14.73-2.39-14.3a.95.95 0 0 0-.94-.81h-4.4a.63.63 0 0 0-.62.74l4.5 20.35-4.22 5.92a.63.63 0 0 0 .52 1h4.43a.95.95 0 0 0 .78-.41l14.28-20.73a.63.63 0 0 0-.52-.99z"/></svg>
+          </button>
+          <div id="paypalButtonsContainer" class="hidden w-full mt-2"></div>
+        </div>
+
+        <!-- Trust Footer -->
+        <div class="pt-2 text-center space-y-1">
+          <div class="text-[10px] font-semibold tracking-wider text-zinc-500 uppercase flex items-center justify-center gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-zinc-400"></i>
+            <span>SSL SECURED • 100% MONEY-BACK GUARANTEE • LIFETIME ACCESS</span>
+          </div>
+          <div class="text-[10px] text-zinc-400 font-normal">
+            Instant digital access immediately after checkout. Zero subscription fees.
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 

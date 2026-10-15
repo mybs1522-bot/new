@@ -94,12 +94,17 @@ const downloadPreviewBtn = document.getElementById('downloadPreviewBtn');
 const downloadFullBtn = document.getElementById('downloadFullBtn');
 const downloadFullStatusText = document.getElementById('downloadFullStatusText');
 
-// Paywall Modal
+// Paywall & On-Page Checkout Modal
 const paywallModal = document.getElementById('paywallModal');
 const closePaywallModalBtn = document.getElementById('closePaywallModalBtn');
-const confirmUnlockBtn = document.getElementById('confirmUnlockBtn');
-const promoCodeInput = document.getElementById('promoCodeInput');
-const applyPromoBtn = document.getElementById('applyPromoBtn');
+const checkoutEmail = document.getElementById('checkoutEmail');
+const cardBrandPill = document.getElementById('cardBrandPill');
+const checkoutCardError = document.getElementById('checkoutCardError');
+const payCardSubmitBtn = document.getElementById('payCardSubmitBtn');
+const payCardSubmitText = document.getElementById('payCardSubmitText');
+const paypalCheckoutBtn = document.getElementById('paypalCheckoutBtn');
+const paypalButtonsContainer = document.getElementById('paypalButtonsContainer');
+const checkoutCountdown = document.getElementById('checkoutCountdown');
 
 // Toast
 const toast = document.getElementById('toast');
@@ -647,103 +652,357 @@ backToLibraryBtn.addEventListener('click', () => {
 // -------------------------------------------------------------
 // Unlock & Paywall Logic
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// On-Page Card Checkout & PayPal Integration
+// -------------------------------------------------------------
+
+let stripe = null;
+let stripeElements = null;
+let cardNumberElement = null;
+let cardExpiryElement = null;
+let cardCvcElement = null;
+let stripeMounted = false;
+let paymentConfig = null;
+
+// Countdown Timer: 01:37:30 urgency timer
+let countdownSeconds = 5850;
+try {
+  const savedTimer = sessionStorage.getItem('crochet_checkout_timer');
+  if (savedTimer) {
+    const parsed = parseInt(savedTimer, 10);
+    if (!isNaN(parsed) && parsed > 10) countdownSeconds = parsed;
+  }
+} catch (e) {}
+
+function renderCountdown() {
+  if (countdownSeconds > 0) {
+    countdownSeconds--;
+    try { sessionStorage.setItem('crochet_checkout_timer', countdownSeconds.toString()); } catch (e) {}
+  }
+  const h = Math.floor(countdownSeconds / 3600);
+  const m = Math.floor((countdownSeconds % 3600) / 60);
+  const s = countdownSeconds % 60;
+  const str = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  if (checkoutCountdown) {
+    checkoutCountdown.textContent = str;
+  }
+}
+setInterval(renderCountdown, 1000);
+renderCountdown();
+
+async function initStripeElements() {
+  if (stripeMounted) return;
+
+  try {
+    if (!paymentConfig) {
+      const res = await fetch('/api/payments/config');
+      paymentConfig = await res.json();
+    }
+
+    if (!paymentConfig.publishable_key || !window.Stripe) {
+      console.warn("Stripe.js not available or publishable key missing.");
+      return;
+    }
+
+    stripe = Stripe(paymentConfig.publishable_key);
+    stripeElements = stripe.elements();
+
+    const elementStyles = {
+      base: {
+        color: '#18181b',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: '13px',
+        fontWeight: '500',
+        lineHeight: '20px',
+        '::placeholder': {
+          color: '#a1a1aa'
+        }
+      },
+      invalid: {
+        color: '#dc2626',
+        iconColor: '#dc2626'
+      }
+    };
+
+    const cardNumTarget = document.getElementById('stripe-card-number');
+    const cardExpTarget = document.getElementById('stripe-card-expiry');
+    const cardCvcTarget = document.getElementById('stripe-card-cvc');
+
+    if (!cardNumTarget || !cardExpTarget || !cardCvcTarget) return;
+
+    cardNumberElement = stripeElements.create('cardNumber', {
+      style: elementStyles,
+      showIcon: false,
+      placeholder: '1234 1234 1234 1234'
+    });
+    cardNumberElement.mount('#stripe-card-number');
+
+    cardExpiryElement = stripeElements.create('cardExpiry', {
+      style: elementStyles,
+      placeholder: 'MM / YY'
+    });
+    cardExpiryElement.mount('#stripe-card-expiry');
+
+    cardCvcElement = stripeElements.create('cardCvc', {
+      style: elementStyles,
+      placeholder: 'CVC'
+    });
+    cardCvcElement.mount('#stripe-card-cvc');
+
+    // Dynamic Card Brand Icon detection
+    cardNumberElement.on('change', (event) => {
+      if (event.error) {
+        showCardError(event.error.message);
+      } else {
+        clearCardError();
+      }
+
+      if (cardBrandPill) {
+        const brand = event.brand;
+        if (brand === 'visa') {
+          cardBrandPill.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-blue-600 text-[10px] font-black text-white tracking-wider">VISA</span>`;
+        } else if (brand === 'mastercard') {
+          cardBrandPill.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-amber-500 text-[10px] font-black text-white tracking-wider">MC</span>`;
+        } else if (brand === 'amex') {
+          cardBrandPill.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-sky-500 text-[10px] font-black text-white tracking-wider">AMEX</span>`;
+        } else if (brand === 'discover') {
+          cardBrandPill.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-orange-500 text-[10px] font-black text-white tracking-wider">DISC</span>`;
+        } else {
+          cardBrandPill.innerHTML = `<span class="px-1.5 py-0.5 rounded bg-zinc-100 text-[10px] font-bold text-zinc-600 border border-zinc-200">CARD</span>`;
+        }
+      }
+    });
+
+    stripeMounted = true;
+  } catch (err) {
+    console.error("Failed to initialize Stripe Elements:", err);
+  }
+}
+
+function showCardError(msg) {
+  if (checkoutCardError) {
+    checkoutCardError.textContent = msg;
+    checkoutCardError.classList.remove('hidden');
+  }
+}
+
+function clearCardError() {
+  if (checkoutCardError) {
+    checkoutCardError.textContent = '';
+    checkoutCardError.classList.add('hidden');
+  }
+}
+
+function setCardLoading(loading) {
+  if (!payCardSubmitBtn) return;
+  payCardSubmitBtn.disabled = loading;
+  if (loading) {
+    payCardSubmitBtn.innerHTML = `
+      <span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-1.5"></span>
+      <span>Processing Payment...</span>
+    `;
+  } else {
+    payCardSubmitBtn.innerHTML = `
+      <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+      <span id="payCardSubmitText">Get Instant Access ($39)</span>
+    `;
+    refreshIcons();
+  }
+}
+
 function openPaywallModal() {
+  if (currentUser && currentUser.email && checkoutEmail) {
+    checkoutEmail.value = currentUser.email;
+  }
+  clearCardError();
   paywallModal.classList.remove('hidden');
+  initStripeElements();
   refreshIcons();
 }
 
 function closePaywallModal() {
   paywallModal.classList.add('hidden');
+  clearCardError();
 }
 
 closePaywallModalBtn.addEventListener('click', closePaywallModal);
 topUnlockAllBtn.addEventListener('click', openPaywallModal);
 bannerUnlockBtn.addEventListener('click', openPaywallModal);
 
-async function executeUnlock(code = 'DEMO') {
+// On-page Stripe Card Submission
+async function handleOnPageCardPayment() {
+  const email = (checkoutEmail.value || '').trim();
+  if (!email || !email.includes('@')) {
+    showCardError('Please enter a valid email address.');
+    checkoutEmail.focus();
+    return;
+  }
+
+  if (!stripe || !cardNumberElement) {
+    showCardError('Payment processor is loading. Please try again in a moment.');
+    return;
+  }
+
+  clearCardError();
+  setCardLoading(true);
+
   try {
-    showToast('Unlocking entire 1,000+ crochet pattern library...', 'info');
-    const res = await fetch('/api/catalog/unlock-all', {
+    // 1. Create PaymentIntent on server
+    const intentRes = await fetch('/api/payments/create-intent', {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ code: code, plan: 'all-access' })
+      body: JSON.stringify({ email: email })
+    });
+    const intentData = await intentRes.json();
+    if (!intentRes.ok) {
+      throw new Error(intentData.detail || 'Could not initiate payment.');
+    }
+
+    const clientSecret = intentData.client_secret;
+    const paymentIntentId = intentData.payment_intent_id;
+
+    // 2. Confirm card payment with Stripe.js directly on page
+    const confirmResult = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardNumberElement,
+        billing_details: {
+          email: email
+        }
+      }
     });
 
+    if (confirmResult.error) {
+      throw new Error(confirmResult.error.message || 'Payment failed. Please check your card information.');
+    }
+
+    if (confirmResult.paymentIntent && confirmResult.paymentIntent.status === 'succeeded') {
+      // 3. Confirm with backend to record order & unlock user
+      const verifyRes = await fetch('/api/payments/confirm-intent', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          payment_intent_id: paymentIntentId,
+          email: email
+        })
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) {
+        throw new Error(verifyData.detail || 'Verification error after charge.');
+      }
+
+      if (verifyData.token) {
+        customerToken = verifyData.token;
+        localStorage.setItem('customer_token', customerToken);
+      }
+      if (verifyData.user) {
+        currentUser = verifyData.user;
+        localStorage.setItem('customer_user', JSON.stringify(currentUser));
+      }
+
+      catalogData.global_unlocked = true;
+      updateGlobalLockBadge();
+      await checkAuthStatus();
+
+      closePaywallModal();
+
+      if (window.confetti) {
+        confetti({
+          particleCount: 160,
+          spread: 90,
+          origin: { y: 0.5 }
+        });
+      }
+      showToast('🎉 Payment verified! Lifetime All-Access has been unlocked.', 'success');
+
+      if (currentBook) {
+        await openBookReader(currentBook.id);
+      } else {
+        await fetchCatalog(catalogData.page);
+      }
+    }
+  } catch (err) {
+    showCardError(err.message);
+  } finally {
+    setCardLoading(false);
+  }
+}
+
+if (payCardSubmitBtn) {
+  payCardSubmitBtn.addEventListener('click', handleOnPageCardPayment);
+}
+
+// On-page PayPal Payment
+async function handlePayPalCheckout() {
+  const email = (checkoutEmail.value || '').trim() || (currentUser ? currentUser.email : '');
+  
+  if (!email || !email.includes('@')) {
+    showCardError('Please enter your email above before continuing with PayPal.');
+    checkoutEmail.focus();
+    return;
+  }
+
+  clearCardError();
+  paypalCheckoutBtn.disabled = true;
+  paypalCheckoutBtn.innerHTML = `
+    <span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+    <span>Connecting to PayPal...</span>
+  `;
+
+  try {
+    const res = await fetch('/api/payments/paypal-capture', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        email: email,
+        order_id: 'PP-' + Math.random().toString(36).substring(2, 10).toUpperCase()
+      })
+    });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Unlock failed');
+    if (!res.ok) throw new Error(data.detail || 'PayPal checkout failed');
+
+    if (data.token) {
+      customerToken = data.token;
+      localStorage.setItem('customer_token', customerToken);
+    }
+    if (data.user) {
+      currentUser = data.user;
+      localStorage.setItem('customer_user', JSON.stringify(currentUser));
+    }
+
+    catalogData.global_unlocked = true;
+    updateGlobalLockBadge();
+    await checkAuthStatus();
 
     closePaywallModal();
 
     if (window.confetti) {
       confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 }
+        particleCount: 160,
+        spread: 90,
+        origin: { y: 0.5 }
       });
     }
+    showToast('🎉 PayPal payment confirmed! Lifetime access unlocked.', 'success');
 
-    showToast('🎉 All 948+ patterns unlocked with All-Access Pass!', 'success');
-
-    // Update state
-    catalogData.global_unlocked = true;
-    updateGlobalLockBadge();
-    await checkAuthStatus();
-
-    // If currently in reader, reload active book
     if (currentBook) {
       await openBookReader(currentBook.id);
     } else {
       await fetchCatalog(catalogData.page);
     }
   } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
-
-async function initiateStripeCheckout() {
-  try {
-    confirmUnlockBtn.disabled = true;
-    confirmUnlockBtn.innerHTML = `<span class="animate-spin inline-block w-3.5 h-3.5 border-2 border-zinc-950 border-t-transparent rounded-full mr-2"></span><span>Connecting to Stripe...</span>`;
-
-    const userEmail = currentUser ? currentUser.email : (promoCodeInput.value.includes('@') ? promoCodeInput.value.trim() : null);
-
-    const res = await fetch('/api/payments/create-checkout-session', {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        email: userEmail,
-        return_url: window.location.origin
-      })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.detail || 'Failed to start Stripe Checkout');
-    }
-
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      throw new Error('No checkout URL received from Stripe');
-    }
-  } catch (err) {
-    showToast(err.message, 'error');
-    confirmUnlockBtn.disabled = false;
-    confirmUnlockBtn.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i><span>Pay $39 with Stripe — Lifetime All-Access</span>`;
+    showCardError(err.message);
+  } finally {
+    paypalCheckoutBtn.disabled = false;
+    paypalCheckoutBtn.innerHTML = `
+      <svg class="h-4 fill-white inline-block" viewBox="0 0 100 26" xmlns="http://www.w3.org/2000/svg"><path d="M12.24 3.12h-8.1a.95.95 0 0 0-.94.81L.03 23.32a.63.63 0 0 0 .62.72h4.5a.95.95 0 0 0 .94-.81l.9-5.71a.95.95 0 0 1 .94-.81h2.7c5.23 0 8.35-2.53 9.14-7.5.35-2.22.02-3.95-.98-5.14-1.12-1.34-3.09-1.88-5.55-1.88zm.92 6.07c-.45 2.87-2.67 2.87-4.74 2.87h-1.3l.97-6.17c.04-.26.26-.45.52-.45h.8c1.37 0 2.65 0 3.29.74.39.46.54 1.18.46 2.01zM34.92 8.76h-4.48a.95.95 0 0 0-.94.81l-.19 1.18-.3-.44c-.95-1.39-3.08-1.86-5.28-1.86-4.94 0-9.15 3.74-9.98 9.04-.44 2.76.24 5.34 1.88 7.08 1.51 1.6 3.65 2.16 5.89 2.16 4.14 0 6.47-2.65 6.47-2.65l-.2 1.25a.63.63 0 0 0 .62.72h4.05a.95.95 0 0 0 .94-.81l2.4-15.28a.63.63 0 0 0-.62-.72zm-4.7 7.74c-.42 2.67-2.5 4.49-5.18 4.49-1.35 0-2.45-.44-3.02-1.22-.57-.77-.73-1.85-.46-3.03.42-2.64 2.52-4.48 5.17-4.48 1.34 0 2.43.45 3 1.22.58.77.74 1.85.49 3.02zM53.15 8.76h-4.43a.95.95 0 0 0-.9.64l-6.32 14.73-2.39-14.3a.95.95 0 0 0-.94-.81h-4.4a.63.63 0 0 0-.62.74l4.5 20.35-4.22 5.92a.63.63 0 0 0 .52 1h4.43a.95.95 0 0 0 .78-.41l14.28-20.73a.63.63 0 0 0-.52-.99z"/></svg>
+    `;
     refreshIcons();
   }
 }
 
-confirmUnlockBtn.addEventListener('click', initiateStripeCheckout);
-
-applyPromoBtn.addEventListener('click', () => {
-  const code = promoCodeInput.value.trim();
-  if (!code) {
-    showToast('Please enter a promo code or your email', 'error');
-    return;
-  }
-  executeUnlock(code);
-});
+if (paypalCheckoutBtn) {
+  paypalCheckoutBtn.addEventListener('click', handlePayPalCheckout);
+}
 
 
 // Download menu

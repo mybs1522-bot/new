@@ -120,3 +120,64 @@ def verify_checkout_session(session_id: str) -> Dict[str, Any]:
         "currency": data.get("currency", "usd")
     }
 
+def create_payment_intent(
+    customer_email: Optional[str] = None,
+    user_id: Optional[int] = None
+) -> Dict[str, Any]:
+    """
+    Creates a Stripe PaymentIntent for on-page direct card checkout ($39.00).
+    """
+    if not is_stripe_configured():
+        raise ValueError("Stripe credentials not configured.")
+
+    amount_cents = int(STRIPE_PRICE_USD * 100)
+    intent_params: Dict[str, Any] = {
+        "amount": amount_cents,
+        "currency": "usd",
+        "description": "Crochet Master Library — Lifetime All-Access (1,000+ Patterns)",
+        "metadata": {
+            "type": "lifetime_all_access",
+            "user_id": str(user_id) if user_id else "",
+            "customer_email": (customer_email or "").strip().lower()
+        },
+        "automatic_payment_methods": {"enabled": True}
+    }
+    if customer_email and customer_email.strip():
+        intent_params["receipt_email"] = customer_email.strip().lower()
+
+    intent = stripe.PaymentIntent.create(**intent_params)
+    return {
+        "client_secret": intent.client_secret,
+        "payment_intent_id": intent.id,
+        "publishable_key": STRIPE_PUBLISHABLE_KEY,
+        "amount": STRIPE_PRICE_USD
+    }
+
+def verify_payment_intent(payment_intent_id: str) -> Dict[str, Any]:
+    """
+    Verifies a succeeded on-page PaymentIntent directly with Stripe API.
+    """
+    if not is_stripe_configured():
+        raise ValueError("Stripe is not configured.")
+
+    intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+    data = intent.to_dict()
+    is_paid = (data.get("status") == "succeeded")
+    metadata = data.get("metadata") or {}
+    customer_email = metadata.get("customer_email") or data.get("receipt_email")
+    user_id = None
+    if metadata.get("user_id"):
+        try:
+            user_id = int(metadata["user_id"])
+        except ValueError:
+            pass
+
+    return {
+        "paid": is_paid,
+        "payment_intent_id": data.get("id", payment_intent_id),
+        "customer_email": customer_email,
+        "user_id": user_id,
+        "amount_total": (data.get("amount") or 0) / 100.0,
+        "currency": data.get("currency", "usd")
+    }
+

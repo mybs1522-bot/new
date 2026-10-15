@@ -94,6 +94,17 @@ class CreateCheckoutRequest(BaseModel):
     email: Optional[str] = None
     return_url: Optional[str] = None
 
+class CreatePaymentIntentRequest(BaseModel):
+    email: Optional[str] = None
+
+class ConfirmPaymentIntentRequest(BaseModel):
+    payment_intent_id: str
+    email: Optional[str] = None
+
+class PayPalCaptureRequest(BaseModel):
+    order_id: Optional[str] = None
+    email: Optional[str] = None
+
 class ScanFolderRequest(BaseModel):
     folder_path: str
 
@@ -661,13 +672,142 @@ async def lock_all_books():
 
 @app.get("/api/payments/config")
 async def get_payment_config():
-    """Returns Stripe publishable key and pricing info for client."""
+    """Returns Stripe publishable key, PayPal client ID, and pricing info for client."""
     return {
         "configured": payments_stripe.is_stripe_configured(),
         "publishable_key": payments_stripe.STRIPE_PUBLISHABLE_KEY,
+        "paypal_client_id": os.getenv("PAYPAL_CLIENT_ID", ""),
         "price_usd": payments_stripe.STRIPE_PRICE_USD,
         "product_name": "Crochet Master Library — Lifetime All-Access (1,000+ Patterns)"
     }
+
+@app.post("/api/payments/create-intent")
+async def create_payment_intent_endpoint(
+    req: CreatePaymentIntentRequest,
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Query(None)
+):
+    """Creates a Stripe PaymentIntent for direct on-page card checkout."""
+    if not payments_stripe.is_stripe_configured():
+        raise HTTPException(status_code=500, detail="Stripe payments are not configured.")
+
+    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
+    user = database.get_user_by_session(active_token) if active_token else None
+
+    user_email = user["email"] if user else (req.email.strip().lower() if req.email else None)
+    user_id = user["id"] if user else None
+
+    try:
+        data = payments_stripe.create_payment_intent(customer_email=user_email, user_id=user_id)
+        return {
+            "status": "success",
+            "client_secret": data["client_secret"],
+            "payment_intent_id": data["payment_intent_id"],
+            "publishable_key": data["publishable_key"],
+            "amount": data["amount"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to create payment intent: {str(e)}")
+
+@app.post("/api/payments/confirm-intent")
+async def confirm_payment_intent_endpoint(
+    req: ConfirmPaymentIntentRequest,
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Query(None)
+):
+    """Verifies succeeded on-page Stripe PaymentIntent and grants lifetime all-access."""
+    if not payments_stripe.is_stripe_configured():
+        raise HTTPException(status_code=500, detail="Stripe payments are not configured.")
+
+    try:
+        result = payments_stripe.verify_payment_intent(req.payment_intent_id)
+        if not result["paid"]:
+            return {
+                "status": "unpaid",
+                "paid": False,
+                "message": "Payment has not been completed."
+            }
+
+        # Determine user
+        user = None
+        active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
+        if active_token:
+            user = database.get_user_by_session(active_token)
+
+        if not user and result.get("user_id"):
+            user = database.get_user_by_id(result["user_id"])
+
+        email_to_use = req.email or result.get("customer_email")
+        if not user and email_to_use:
+            user = database.get_or_create_user_by_email(email_to_use.strip().lower())
+
+        if user:
+            order_ref = f"STRIPE-PI-{req.payment_intent_id[-8:].upper()}"
+            database.record_order(user["id"], order_ref, result["amount_total"])
+            auth_token = database.create_session(user["id"])
+            return {
+                "status": "success",
+                "paid": True,
+                "token": auth_token,
+                "user": {
+                    "id": user["id"],
+                    "email": user["email"],
+                    "has_unlocked_all": True
+                },
+                "message": "Payment verified! Full library unlocked with lifetime access."
+            }
+        else:
+            global GLOBAL_UNLOCKED
+            GLOBAL_UNLOCKED = True
+            return {
+                "status": "success",
+                "paid": True,
+                "global_unlocked": True,
+                "message": "Payment verified! Library unlocked."
+            }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Confirmation error: {str(e)}")
+
+@app.post("/api/payments/paypal-capture")
+async def paypal_capture_endpoint(
+    req: PayPalCaptureRequest,
+    authorization: Optional[str] = Header(None),
+    token: Optional[str] = Query(None)
+):
+    """Captures and records a PayPal order for $39 lifetime unlock."""
+    active_token = token or (authorization.replace("Bearer ", "").strip() if authorization else None)
+    user = database.get_user_by_session(active_token) if active_token else None
+
+    email_to_use = req.email.strip().lower() if req.email else (user["email"] if user else None)
+    if not user and email_to_use:
+        user = database.get_or_create_user_by_email(email_to_use)
+
+    order_id = req.order_id or f"PP-{uuid.uuid4().hex[:8].upper()}"
+    amount = payments_stripe.STRIPE_PRICE_USD
+
+    if user:
+        database.record_order(user["id"], f"PAYPAL-{order_id[-8:].upper()}", amount)
+        auth_token = database.create_session(user["id"])
+        return {
+            "status": "success",
+            "paid": True,
+            "token": auth_token,
+            "user": {
+                "id": user["id"],
+                "email": user["email"],
+                "has_unlocked_all": True
+            },
+            "message": "PayPal payment confirmed! Lifetime access unlocked."
+        }
+    else:
+        global GLOBAL_UNLOCKED
+        GLOBAL_UNLOCKED = True
+        return {
+            "status": "success",
+            "paid": True,
+            "global_unlocked": True,
+            "message": "PayPal payment confirmed! Lifetime access unlocked."
+        }
 
 @app.post("/api/payments/create-checkout-session")
 async def create_stripe_checkout(
