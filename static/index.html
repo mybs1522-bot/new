@@ -38,9 +38,10 @@
   <header class="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#090a0c]/90 backdrop-blur-md px-4 lg:px-8 py-3.5 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <!-- Back to Library Button (Only visible in reader mode) -->
-      <button id="backToLibraryBtn" class="hidden items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs font-medium transition border border-white/10 shadow-sm">
+      <button id="backToLibraryBtn" class="hidden items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg text-xs font-medium transition border border-white/10 shadow-sm shrink-0">
         <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-zinc-400"></i>
-        <span>Back to Archive</span>
+        <span class="hidden sm:inline">Back to Archive</span>
+        <span class="sm:hidden">Back</span>
       </button>
 
       <div class="h-8 w-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-200 shrink-0">
@@ -53,13 +54,13 @@
             Preview Mode
           </span>
         </div>
-        <p id="topSubheader" class="text-xs text-zinc-500 truncate max-w-[200px] sm:max-w-md">Video Masterclass + 1,000+ Patterns PDF Treasury</p>
+        <p id="topSubheader" class="text-xs text-zinc-500 truncate max-w-[120px] sm:max-w-md">Video Masterclass + 1,000+ Patterns PDF Treasury</p>
       </div>
     </div>
 
     <!-- Reader Bar Controls (Visible only when reading a book) -->
     <div id="readerToolbar" class="hidden items-center gap-2 sm:gap-3">
-      <div class="flex items-center bg-zinc-900 border border-white/10 rounded-lg p-1 text-xs">
+      <div class="hidden sm:flex items-center bg-zinc-900 border border-white/10 rounded-lg p-1 text-xs">
         <button id="zoomOutBtn" title="Zoom Out" class="p-1.5 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white transition">
           <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
         </button>
@@ -231,35 +232,52 @@
     </section>
 
     <!-- VIEW 2: ACTIVE READER VIEW -->
-    <section id="readerSection" class="hidden w-full h-[calc(100vh-65px)] flex flex-row overflow-hidden">
+    <section id="readerSection" class="hidden w-full h-[calc(100vh-65px)] flex flex-row overflow-hidden relative">
       
-      <!-- Left Thumbnail Sidebar -->
-      <aside id="thumbnailSidebar" class="w-44 md:w-56 shrink-0 border-r border-white/[0.08] bg-[#0c0d10] flex flex-col overflow-hidden">
+      <!-- Left Thumbnail Sidebar (Desktop static sidebar, mobile slide-over drawer) -->
+      <aside id="thumbnailSidebar" class="hidden md:flex flex-col w-44 md:w-56 shrink-0 border-r border-white/[0.08] bg-[#0c0d10] overflow-hidden transition-all duration-200">
         <div class="p-3 border-b border-white/[0.08] flex items-center justify-between text-xs text-zinc-400 font-medium">
-          <span>PAGES (<span id="sidebarPageCount">0</span>)</span>
-          <span id="sidebarLockedCount" class="text-zinc-500 font-normal">Locked: 0</span>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-zinc-400"></i>
+            <span>PAGES (<span id="sidebarPageCount">0</span>)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="sidebarLockedCount" class="text-zinc-500 font-normal">Locked: 0</span>
+            <button id="closeSidebarMobileBtn" class="md:hidden p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white" title="Close Pages">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
         </div>
         <div id="thumbnailList" class="flex-1 overflow-y-auto p-3 space-y-3">
           <!-- Thumbnails injected via JS -->
         </div>
       </aside>
 
+      <!-- Mobile Sidebar Backdrop Overlay -->
+      <div id="mobileSidebarBackdrop" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-xs md:hidden"></div>
+
       <!-- Center Document Viewport -->
-      <div id="viewportContainer" class="flex-1 h-full overflow-y-auto bg-[#090a0c] p-4 sm:p-8 flex flex-col items-center">
+      <div id="viewportContainer" class="flex-1 h-full overflow-y-auto bg-[#090a0c] p-2 sm:p-6 md:p-8 flex flex-col items-center">
         
         <!-- Floating Navigation / Page Indicator -->
-        <div class="sticky top-2 z-30 mb-4 px-4 py-1.5 rounded-full bg-[#121316]/90 border border-white/10 backdrop-blur-md shadow-xl flex items-center gap-3 text-xs">
+        <div class="sticky top-2 z-30 mb-4 px-3 sm:px-4 py-1.5 rounded-full bg-[#121316]/90 border border-white/10 backdrop-blur-md shadow-xl flex items-center gap-2 sm:gap-3 text-xs">
+          <!-- Mobile Thumbnail Drawer Button -->
+          <button id="mobileSidebarToggleBtn" class="md:hidden p-1 hover:bg-zinc-800 rounded text-zinc-300 flex items-center gap-1 border border-white/10 px-2" title="View Page Thumbnails">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-pink-400"></i>
+            <span class="text-[10px] font-semibold">Pages</span>
+          </button>
+          <span class="md:hidden w-px h-3.5 bg-white/10"></span>
           <button id="prevPageBtn" class="p-1 hover:bg-zinc-800 rounded text-zinc-400 disabled:opacity-30">
             <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
           </button>
-          <span class="text-zinc-400 font-medium">Page <span id="currentPageNum" class="text-zinc-100 font-bold">1</span> of <span id="totalPageNum">1</span></span>
+          <span class="text-zinc-400 font-medium whitespace-nowrap">Page <span id="currentPageNum" class="text-zinc-100 font-bold">1</span> of <span id="totalPageNum">1</span></span>
           <button id="nextPageBtn" class="p-1 hover:bg-zinc-800 rounded text-zinc-400 disabled:opacity-30">
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
           </button>
         </div>
 
         <!-- Pages Container -->
-        <div id="documentPagesContainer" class="w-full max-w-3xl flex flex-col items-center gap-8 pb-16">
+        <div id="documentPagesContainer" class="w-full max-w-3xl flex flex-col items-center gap-5 sm:gap-8 pb-16">
           <!-- Pages rendered here -->
         </div>
 
@@ -282,10 +300,10 @@
       <div class="bg-black text-white p-6 sm:p-7 relative">
         <div class="flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-zinc-400 mb-1.5">
           <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span>COMPLETE CROCHET LIBRARY</span>
+          <span>COMPLETE CROCHET BUNDLE</span>
         </div>
         <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2.5">
-          1,000+ Crochet Patterns
+          1,000+ Crochet Patterns & Video Course
         </h3>
         <div class="flex items-baseline gap-2.5">
           <span class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">$39</span>

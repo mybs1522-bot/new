@@ -95,8 +95,35 @@ const readerToolbar = document.getElementById('readerToolbar');
 const backToLibraryBtn = document.getElementById('backToLibraryBtn');
 const globalStatusBadge = document.getElementById('globalStatusBadge');
 const topSubheader = document.getElementById('topSubheader');
-const topUnlockAllBtn = document.getElementById('topUnlockAllBtn');
 const bannerUnlockBtn = document.getElementById('bannerUnlockBtn');
+const thumbnailSidebar = document.getElementById('thumbnailSidebar');
+const mobileSidebarToggleBtn = document.getElementById('mobileSidebarToggleBtn');
+const closeSidebarMobileBtn = document.getElementById('closeSidebarMobileBtn');
+const mobileSidebarBackdrop = document.getElementById('mobileSidebarBackdrop');
+
+function openMobileSidebar() {
+  if (!thumbnailSidebar) return;
+  thumbnailSidebar.classList.remove('hidden');
+  thumbnailSidebar.classList.add('fixed', 'inset-y-0', 'left-0', 'z-50', 'w-64', 'shadow-2xl', 'flex');
+  if (mobileSidebarBackdrop) mobileSidebarBackdrop.classList.remove('hidden');
+}
+
+function closeMobileSidebar() {
+  if (!thumbnailSidebar) return;
+  thumbnailSidebar.classList.remove('fixed', 'inset-y-0', 'left-0', 'z-50', 'w-64', 'shadow-2xl');
+  if (window.innerWidth < 768) {
+    thumbnailSidebar.classList.add('hidden');
+    thumbnailSidebar.classList.remove('flex');
+  } else {
+    thumbnailSidebar.classList.remove('hidden');
+    thumbnailSidebar.classList.add('flex');
+  }
+  if (mobileSidebarBackdrop) mobileSidebarBackdrop.classList.add('hidden');
+}
+
+if (mobileSidebarToggleBtn) mobileSidebarToggleBtn.addEventListener('click', openMobileSidebar);
+if (closeSidebarMobileBtn) closeSidebarMobileBtn.addEventListener('click', closeMobileSidebar);
+if (mobileSidebarBackdrop) mobileSidebarBackdrop.addEventListener('click', closeMobileSidebar);
 
 // Auth DOM Elements
 const authModal = document.getElementById('authModal');
@@ -526,12 +553,12 @@ function renderPages() {
     
     if (page.is_blurred) {
       pageBar.innerHTML = `
-        <div class="flex items-center gap-2 text-rose-400 font-semibold">
-          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span>Page ${page.page_num} of ${currentBook.page_count} (Blurred Paywall)</span>
+        <div class="flex items-center gap-1.5 sm:gap-2 text-rose-400 font-semibold text-[11px] sm:text-xs truncate">
+          <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i>
+          <span>Page ${page.page_num} of ${currentBook.page_count} (Locked)</span>
         </div>
-        <button class="unlock-btn-inline px-2.5 py-1 rounded-md bg-pink-600 hover:bg-pink-500 text-white font-bold text-[11px] transition flex items-center gap-1">
-          <i data-lucide="sparkles" class="w-3 h-3"></i> Unlock All Patterns
+        <button class="unlock-btn-inline px-2.5 py-1 rounded-md bg-pink-600 hover:bg-pink-500 text-white font-bold text-[10px] sm:text-[11px] transition flex items-center gap-1 shrink-0">
+          <i data-lucide="sparkles" class="w-3 h-3"></i> Unlock Course + Patterns ($39)
         </button>
       `;
     } else {
@@ -578,54 +605,56 @@ function renderPages() {
   document.querySelectorAll('.unlock-btn-inline').forEach(btn => {
     btn.addEventListener('click', openPaywallModal);
   });
+  refreshIcons();
 }
 
 function createPaywallOverlay(pageNum) {
   const overlay = document.createElement('div');
-  overlay.className = 'absolute inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 sm:p-6';
+  overlay.className = 'absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto z-20';
 
   overlay.innerHTML = `
-    <div class="bg-[#121316] max-w-md w-full rounded-2xl border border-white/10 p-6 sm:p-8 text-center space-y-4 shadow-2xl relative">
+    <div class="bg-[#121316] max-w-sm sm:max-w-md w-full rounded-2xl border border-white/10 p-4 sm:p-7 text-center space-y-3 sm:space-y-4 shadow-2xl relative my-auto">
       
-      <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 text-zinc-300 mx-auto">
-        <i data-lucide="lock" class="w-5 h-5"></i>
+      <div class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-900 border border-white/10 text-zinc-300 mx-auto">
+        <i data-lucide="lock" class="w-4 h-4 sm:w-5 sm:h-5 text-pink-400"></i>
       </div>
 
-      <div class="space-y-1">
-        <div class="inline-block px-2.5 py-0.5 rounded-full bg-zinc-900 border border-white/10 text-zinc-400 text-[10px] font-medium uppercase tracking-wider">
-          Full Pattern Locked
+      <div class="space-y-1 sm:space-y-1.5">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[10px] font-semibold tracking-wider uppercase">
+          <i data-lucide="sparkles" class="w-2.5 h-2.5 text-pink-400"></i>
+          <span>1,000+ PATTERNS + VIDEO COURSE</span>
         </div>
-        <h3 class="text-lg font-semibold text-white tracking-tight">
-          Unlock All 1,000+ Crochet Patterns
+        <h3 class="text-base sm:text-xl font-bold text-white tracking-tight leading-snug">
+          Unlock All Patterns & Video Course
         </h3>
-        <p class="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
-          Access complete step-by-step stitch instructions, round counts, and printable diagrams for all 948+ patterns.
+        <p class="text-[11px] sm:text-xs text-zinc-300 max-w-sm mx-auto leading-relaxed">
+          Access complete step-by-step instructions for all 948+ patterns, plus Olivia Pant’s complete 34-lesson video masterclass included.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 text-left bg-zinc-900/50 p-3 rounded-xl border border-white/[0.06] text-xs text-zinc-300">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left bg-zinc-900/70 p-3 sm:p-3.5 rounded-xl border border-white/[0.08] text-xs text-zinc-200">
         <div class="flex items-center gap-2">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-400"></i>
-          <span>Instant unblur access</span>
+          <i data-lucide="video" class="w-3.5 h-3.5 text-pink-400 shrink-0"></i>
+          <span class="font-medium text-white">34 Video Lessons Included</span>
         </div>
         <div class="flex items-center gap-2">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-400"></i>
-          <span>Printable vector PDFs</span>
+          <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>Download All 1,000+ PDFs</span>
         </div>
         <div class="flex items-center gap-2">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-400"></i>
-          <span>All 948 patterns</span>
+          <i data-lucide="unlock" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+          <span>Instant Unblur All 948 Patterns</span>
         </div>
         <div class="flex items-center gap-2">
-          <i data-lucide="check" class="w-3.5 h-3.5 text-zinc-400"></i>
-          <span>One-time payment, lifetime updates</span>
+          <i data-lucide="infinity" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+          <span>Lifetime Access (Pay Once $39)</span>
         </div>
       </div>
 
-      <div class="pt-1">
-        <button class="paywall-cta-trigger w-full py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm text-zinc-950 bg-white hover:bg-zinc-200 shadow-sm transition flex items-center justify-center gap-2">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-zinc-700"></i>
-          <span>Unlock Lifetime All-Access ($39)</span>
+      <div class="pt-0.5">
+        <button class="paywall-cta-trigger w-full py-3 px-5 rounded-xl font-bold text-xs sm:text-sm text-zinc-950 bg-white hover:bg-zinc-200 shadow-md transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0">
+          <i data-lucide="sparkles" class="w-4 h-4 text-zinc-800"></i>
+          <span>Unlock Patterns + Video Course ($39)</span>
         </button>
       </div>
 
@@ -652,6 +681,10 @@ function jumpToPage(index) {
       }
     }
   });
+
+  if (window.innerWidth < 768) {
+    closeMobileSidebar();
+  }
 
   const targetPage = document.getElementById(`view-page-${index + 1}`);
   if (targetPage) {
@@ -685,6 +718,7 @@ zoomOutBtn.addEventListener('click', () => {
 
 // Back to library
 backToLibraryBtn.addEventListener('click', () => {
+  closeMobileSidebar();
   readerSection.classList.add('hidden');
   readerToolbar.classList.add('hidden');
   readerToolbar.classList.remove('flex');
