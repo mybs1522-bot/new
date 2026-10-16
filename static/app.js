@@ -95,6 +95,7 @@ const readerToolbar = document.getElementById('readerToolbar');
 const backToLibraryBtn = document.getElementById('backToLibraryBtn');
 const globalStatusBadge = document.getElementById('globalStatusBadge');
 const topSubheader = document.getElementById('topSubheader');
+const topUnlockAllBtn = document.getElementById('topUnlockAllBtn');
 const bannerUnlockBtn = document.getElementById('bannerUnlockBtn');
 const thumbnailSidebar = document.getElementById('thumbnailSidebar');
 const mobileSidebarToggleBtn = document.getElementById('mobileSidebarToggleBtn');
