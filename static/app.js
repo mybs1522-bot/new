@@ -874,6 +874,10 @@ function closePaywallModal() {
 closePaywallModalBtn.addEventListener('click', closePaywallModal);
 topUnlockAllBtn.addEventListener('click', openPaywallModal);
 bannerUnlockBtn.addEventListener('click', openPaywallModal);
+const courseUnlockBtn = document.getElementById('courseUnlockBtn');
+if (courseUnlockBtn) {
+  courseUnlockBtn.addEventListener('click', openPaywallModal);
+}
 
 // On-page Stripe Card Submission
 async function handleOnPageCardPayment() {
@@ -1395,6 +1399,9 @@ async function handlePaymentReturn() {
   await checkAuthStatus();
   await fetchCatalog(1);
   initFloatingCrochetHero();
+  if (new URLSearchParams(window.location.search).get('unlock') === 'true') {
+    openPaywallModal();
+  }
 })();
 
 
