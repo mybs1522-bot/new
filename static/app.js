@@ -420,6 +420,7 @@ async function openBookReader(bookId) {
     readerToolbar.classList.add('flex');
     backToLibraryBtn.classList.remove('hidden');
     backToLibraryBtn.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
 
     // Update Header
     topSubheader.textContent = currentBook.title;
@@ -689,6 +690,7 @@ backToLibraryBtn.addEventListener('click', () => {
   readerToolbar.classList.remove('flex');
   backToLibraryBtn.classList.add('hidden');
   backToLibraryBtn.classList.remove('flex');
+  document.body.classList.remove('overflow-hidden');
 
   catalogSection.classList.remove('hidden');
   topSubheader.textContent = '1,000+ Crochet Patterns Collection';

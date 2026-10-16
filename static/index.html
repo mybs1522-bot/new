@@ -116,10 +116,10 @@
   </header>
 
   <!-- Main Viewports -->
-  <main class="flex-1 flex flex-col overflow-hidden relative">
+  <main class="flex-1 flex flex-col relative w-full">
 
     <!-- VIEW 1: CATALOG / STOREFRONT GRID -->
-    <section id="catalogSection" class="flex-1 flex flex-col overflow-y-auto bg-[#090a0c] px-4 sm:px-8 py-6">
+    <section id="catalogSection" class="w-full flex-1 bg-[#090a0c] px-4 sm:px-8 py-6">
       
       <!-- Catalog Container -->
       <div class="max-w-7xl w-full mx-auto space-y-8">
@@ -289,12 +289,26 @@
           </button>
         </div>
 
+        <!-- Footer -->
+        <footer class="border-t border-white/[0.08] pt-8 pb-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-zinc-400"></i>
+            <span class="text-zinc-300 font-semibold">1,000+ Crochet Patterns Archive</span>
+            <span>• 948 Master Guides & Free Video Course</span>
+          </div>
+          <div class="flex items-center gap-6 text-zinc-400">
+            <a href="/learn" class="hover:text-white transition">Video Masterclass</a>
+            <a href="#floatingHeroSection" class="hover:text-white transition">Back to Top</a>
+            <span>Lifetime All-Access Available</span>
+          </div>
+        </footer>
+
       </div>
 
     </section>
 
     <!-- VIEW 2: ACTIVE READER VIEW -->
-    <section id="readerSection" class="hidden flex-1 flex flex-row overflow-hidden">
+    <section id="readerSection" class="hidden w-full h-[calc(100vh-65px)] flex flex-row overflow-hidden">
       
       <!-- Left Thumbnail Sidebar -->
       <aside id="thumbnailSidebar" class="w-44 md:w-56 shrink-0 border-r border-white/[0.08] bg-[#0c0d10] flex flex-col overflow-hidden">
