@@ -872,7 +872,9 @@ function closePaywallModal() {
 }
 
 closePaywallModalBtn.addEventListener('click', closePaywallModal);
-topUnlockAllBtn.addEventListener('click', openPaywallModal);
+if (topUnlockAllBtn) {
+  topUnlockAllBtn.addEventListener('click', openPaywallModal);
+}
 bannerUnlockBtn.addEventListener('click', openPaywallModal);
 const courseUnlockBtn = document.getElementById('courseUnlockBtn');
 if (courseUnlockBtn) {
