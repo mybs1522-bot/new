@@ -239,7 +239,7 @@ async function checkAuthStatus() {
         catalogData.global_unlocked = true;
         updateGlobalLockBadge();
       } else {
-        userAccessBadge.textContent = 'Free';
+        userAccessBadge.textContent = 'Standard';
         userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
       }
     }
@@ -263,7 +263,7 @@ async function checkAuthStatus() {
             catalogData.global_unlocked = true;
             updateGlobalLockBadge();
           } else {
-            userAccessBadge.textContent = 'Free';
+            userAccessBadge.textContent = 'Standard';
             userAccessBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400';
           }
         }
@@ -1081,82 +1081,82 @@ downloadFullBtn.addEventListener('click', () => {
 const crochetHeroSvgIcons = [
   // 1. Yarn Ball
   {
-    id: 1, pos: 'top-[8%] left-[6%]',
+    id: 1, pos: 'top-[8%] left-[4%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9" /><path d="M5.5 8C8.5 6.5 14.5 7 18 10.5" stroke-linecap="round"/><path d="M4 12C7.5 11 15 11.5 19 14.5" stroke-linecap="round"/><path d="M6 16C9 15.5 14.5 16 17.5 18" stroke-linecap="round"/><path d="M12 3C11 7 11.5 16 13 21" stroke-linecap="round"/><path d="M18 19C19 21 21 21.5 22 20.5" stroke-linecap="round"/></svg>`
   },
   // 2. Crochet Hook
   {
-    id: 2, pos: 'top-[12%] right-[8%]',
+    id: 2, pos: 'top-[8%] right-[4%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M4 20L13.5 10.5" stroke-width="2.5" stroke-linecap="round"/><path d="M13.5 10.5L19 5C19.5 4.5 20.5 4 21 4.5C21.5 5 21 6 20.5 6.5L18.5 8.5C18 9 17 9 16.5 8.5" stroke-linecap="round"/></svg>`
   },
   // 3. Granny Square
   {
-    id: 3, pos: 'bottom-[12%] left-[8%]',
+    id: 3, pos: 'bottom-[8%] left-[4%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3" /><rect x="7" y="7" width="10" height="10" rx="1.5" /><rect x="10.5" y="10.5" width="3" height="3" fill="currentColor" fill-opacity="0.3"/></svg>`
   },
   // 4. Amigurumi Bear
   {
-    id: 4, pos: 'bottom-[12%] right-[10%]',
+    id: 4, pos: 'bottom-[8%] right-[4%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="3" /><circle cx="18" cy="6" r="3" /><circle cx="12" cy="13" r="8" /><circle cx="9.5" cy="11.5" r="1" fill="currentColor"/><circle cx="14.5" cy="11.5" r="1" fill="currentColor"/><ellipse cx="12" cy="15" rx="2.5" ry="1.8" /><path d="M11 14.5C11.5 15 12.5 15 13 14.5" stroke-linecap="round"/></svg>`
   },
   // 5. Crochet Heart
   {
-    id: 5, pos: 'top-[4%] left-[26%]',
+    id: 5, pos: 'top-[4%] left-[18%] hidden xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M12 20.5S3 14.5 3 8.5A5.5 5.5 0 0 1 12 5.09A5.5 5.5 0 0 1 21 8.5C21 14.5 12 20.5 12 20.5Z" stroke-linejoin="round"/></svg>`
   },
   // 6. Vintage Stork Scissors
   {
-    id: 6, pos: 'top-[4%] right-[26%]',
+    id: 6, pos: 'top-[4%] right-[18%] hidden xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="18" r="3" /><circle cx="12" cy="18" r="3" /><path d="M8 15L15 4L16 5L10 16" stroke-linecap="round"/><path d="M15 4L20 8" stroke-linecap="round"/></svg>`
   },
   // 7. Yarn Skein
   {
-    id: 7, pos: 'bottom-[14%] left-[22%]',
+    id: 7, pos: 'bottom-[8%] left-[16%] hidden xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="12" rx="9" ry="5.5" /><rect x="9.5" y="6.5" width="5" height="11" rx="1" fill="currentColor" fill-opacity="0.2"/></svg>`
   },
   // 8. Sunflower Applique
   {
-    id: 8, pos: 'top-[44%] left-[4%]',
+    id: 8, pos: 'top-[36%] left-[2%] hidden 2xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4" /><circle cx="12" cy="5" r="2.2" /><circle cx="12" cy="19" r="2.2" /><circle cx="5" cy="12" r="2.2" /><circle cx="19" cy="12" r="2.2" /></svg>`
   },
   // 9. Stitch Marker
   {
-    id: 9, pos: 'top-[74%] right-[22%]',
+    id: 9, pos: 'bottom-[8%] right-[16%] hidden xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M12 4C8.5 4 6 7 6 11C6 16 11 20 12 21C13 20 18 16 18 11C18 7 15.5 4 12 4Z" /><circle cx="12" cy="10" r="2" fill="currentColor" fill-opacity="0.3"/></svg>`
   },
   // 10. Crochet Pom-pom Beanie
   {
-    id: 10, pos: 'bottom-[24%] left-[6%]',
+    id: 10, pos: 'bottom-[28%] left-[2%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="4" r="2.2" /><path d="M5 17C5 10 7.5 6 12 6C16.5 6 19 10 19 17" /><rect x="4" y="17" width="16" height="4" rx="2" /></svg>`
   },
   // 11. Amigurumi Frog
   {
-    id: 11, pos: 'top-[50%] right-[5%]',
+    id: 11, pos: 'top-[36%] right-[2%] hidden 2xl:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="14" rx="8" ry="6" /><circle cx="7" cy="8" r="2.5" /><circle cx="17" cy="8" r="2.5" /><path d="M8 15C10 17 14 17 16 15" stroke-linecap="round"/></svg>`
   },
   // 12. Tapestry Needle
   {
-    id: 12, pos: 'top-[62%] left-[14%]',
+    id: 12, pos: 'top-[22%] left-[3%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M3 21L19 5" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="19" cy="5" rx="1.5" ry="3" transform="rotate(-45 19 5)" /></svg>`
   },
   // 13. Baby Bootie
   {
-    id: 13, pos: 'top-[20%] left-[18%]',
+    id: 13, pos: 'top-[8%] left-[10%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M6 5H11V11C11 11 16 11 18 13C20 15 20 18 18 19C16 20 6 20 5 19C4 18 4 14 6 12V5Z" stroke-linejoin="round"/></svg>`
   },
   // 14. Magic Ring Loop
   {
-    id: 14, pos: 'bottom-[22%] right-[18%]',
+    id: 14, pos: 'bottom-[28%] right-[2%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="7" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.2"/></svg>`
   },
   // 15. Measuring Tape
   {
-    id: 15, pos: 'top-[28%] right-[16%]',
+    id: 15, pos: 'top-[22%] right-[3%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="12" r="6" /><path d="M10 18H20C21 18 22 17 22 16V14C22 13 21 12 20 12H16" /></svg>`
   },
   // 16. Market Mesh Bag
   {
-    id: 16, pos: 'top-[68%] left-[28%]',
+    id: 16, pos: 'top-[8%] right-[10%] hidden lg:block',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M8 8V5C8 3.5 10 3 12 3C14 3 16 3.5 16 5V8" stroke-linecap="round"/><path d="M5 8H19L18 20C18 21 17 22 16 22H8C7 22 6 21 6 20L5 8Z" /><path d="M8 12L16 16M16 12L8 16" stroke-linecap="round"/></svg>`
   }
 ];
