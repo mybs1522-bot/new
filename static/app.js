@@ -693,7 +693,7 @@ backToLibraryBtn.addEventListener('click', () => {
   document.body.classList.remove('overflow-hidden');
 
   catalogSection.classList.remove('hidden');
-  topSubheader.textContent = '1,000+ Crochet Patterns Collection';
+  topSubheader.textContent = 'Video Masterclass + 1,000+ Patterns PDF Treasury';
   fetchCatalog(catalogData.page);
 });
 
