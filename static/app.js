@@ -1126,7 +1126,7 @@ const crochetHeroSvgIcons = [
   },
   // 10. Crochet Pom-pom Beanie
   {
-    id: 10, pos: 'bottom-[6%] left-[48%]',
+    id: 10, pos: 'bottom-[24%] left-[6%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="4" r="2.2" /><path d="M5 17C5 10 7.5 6 12 6C16.5 6 19 10 19 17" /><rect x="4" y="17" width="16" height="4" rx="2" /></svg>`
   },
   // 11. Amigurumi Frog
@@ -1141,12 +1141,12 @@ const crochetHeroSvgIcons = [
   },
   // 13. Baby Bootie
   {
-    id: 13, pos: 'top-[6%] left-[50%]',
+    id: 13, pos: 'top-[20%] left-[18%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><path d="M6 5H11V11C11 11 16 11 18 13C20 15 20 18 18 19C16 20 6 20 5 19C4 18 4 14 6 12V5Z" stroke-linejoin="round"/></svg>`
   },
   // 14. Magic Ring Loop
   {
-    id: 14, pos: 'bottom-[10%] right-[38%]',
+    id: 14, pos: 'bottom-[22%] right-[18%]',
     svg: `<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 md:w-7 md:h-7 text-zinc-400" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="7" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="3" fill="currentColor" fill-opacity="0.2"/></svg>`
   },
   // 15. Measuring Tape
